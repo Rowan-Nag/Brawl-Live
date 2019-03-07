@@ -10,8 +10,3 @@ canvas {
   image-rendering: crisp-edges;
   
 }
-
-div {
-  display: block;
-  margin: 0 auto;
-}
