@@ -132,12 +132,6 @@ class Player{
     }
     this.facing = Math.atan2(this.y-yTemp, this.x-xTemp)
     
-    if(this.y == yTemp && this.x == xTemp){
-      this.image = document.getElementById("p1Idle")
-      this.facing = -10
-    }
-    
-    
     if(this.x < 0){
       this.x = 0
     }
