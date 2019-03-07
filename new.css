@@ -10,3 +10,11 @@ canvas {
   image-rendering: crisp-edges;
   
 }
+.box{
+	width:100px;
+	height:100px;
+}
+ 
+.red{
+	background:#f00;
+}
