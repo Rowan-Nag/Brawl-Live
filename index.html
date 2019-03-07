@@ -177,6 +177,171 @@ class Game{
     this.genMap(16, 16);
     setInterval(this.player1.incrementFrame(1,2), 100);
   }
+var canvas = document.getElementById('base');
+ctx = canvas.getContext('2d');
+WIDTH = canvas.width;
+HEIGHT = canvas.height;
+ctx.fillRect(0,0,WIDTH,HEIGHT)
+var ticks = 0
+
+var keys = {down: 40,
+            up: 38,
+            left: 37,
+            right: 39,
+            jump: 32,
+            a:65,
+            s:83,
+            d:68,
+            q: 81,
+            w: 87,
+            e: 69,
+            r: 82,},
+    keysDown = {},
+    frameRate = 1/60,
+    frameDelay = frameRate*1000
+
+addEventListener("keydown", function (e) {
+  keysDown[e.keyCode] = true;
+}, false);
+addEventListener("keyup", function (e) {
+  delete keysDown[e.keyCode];
+}, false);
+
+
+var requestInterval = function (fn, delay) {
+  var requestAnimFrame = (function () {
+    return window.requestAnimationFrame || function (callback, element) {
+      window.setTimeout(callback,  frameDelay);
+    };
+  })(),
+      start = new Date().getTime(),
+      handle = {};
+  function loop() {
+    handle.value = requestAnimFrame(loop);
+    var current = new Date().getTime(),
+        delta = current - start;
+    if (delta >= delay) {
+      fn.call();
+      start = new Date().getTime();
+    }
+  }
+  handle.value = requestAnimFrame(loop);
+  return handle;
+};
+
+
+class Tile{
+  constructor(x, y, width, height, type, collision){
+    this.x = x;
+    this.y = y;
+    this.width = width;
+    this.height = height;
+    this.image = document.getElementById(type);
+    this.collision = collision;
+  }
+}
+
+
+
+
+
+class Player{
+  constructor(img){
+    this.image = document.getElementById(img)
+    this.x = WIDTH/2;
+    this.y = HEIGHT/2;
+    this.speed = 4
+    this.facing = 0
+    this.width = 50
+    this.height =50
+  }
+  
+  draw(x, y){
+    ctx.drawImage(this.image,0, 128*this.frameX, 128, 128, x, y, this.width, this.height);
+    
+  }
+  incrementFrame(numFrames, delayAmount) {
+    if (this.delay < delayAmount) {
+      this.delay += 1;
+    } else {
+      if (this.frameX < numFrames ) {
+        this.frameX += 1;
+      } else {
+        this.frameX = 0;
+        this.delay = 0; 
+      }
+    }
+  } 
+  
+  move(){
+    let xTemp = this.x+0, yTemp = this.y+0
+    
+    if(keys.a in keysDown){
+      this.x -= this.speed
+      this.image = document.getElementById("p1Left")
+      if(ticks%5===0){
+        this.incrementFrame()
+      }
+    }
+    if(keys.d in keysDown){
+      this.x += this.speed
+      this.image = document.getElementById("p1Right")
+    }
+    if(keys.w in keysDown){
+      this.y -= this.speed
+      this.image = document.getElementById("p1Up")
+    }
+    if(keys.s in keysDown){
+      this.y += this.speed
+      this.image = document.getElementById("p1Down")
+    }
+    this.facing = Math.atan2(this.y-yTemp, this.x-xTemp)
+    
+    if(this.y == yTemp && this.x == xTemp){
+      this.image = document.getElementById("p1Idle")
+      this.facing = -10
+    }
+    
+    
+    if(this.x < 0){
+      this.x = 0
+    }
+    if(this.y < 0){
+      this.y = 0
+    }
+  
+    if(this.y > (game.map[0].length-1)*game.tileSize){
+      
+      this.y = (game.map[0].length-1)*game.tileSize
+    }
+    if(this.x > (game.map.length-1)*game.tileSize){
+      this.x = (game.map.length-1)*game.tileSize
+    }
+   
+    if(this.x > WIDTH/2 && this.x < game.tileSize*game.map.length-WIDTH/2){
+      game.cameraX = this.x
+    }
+    if(this.y > HEIGHT/2 && this.y < game.tileSize*game.map[0].length-HEIGHT/2){
+      game.cameraY = this.y
+    }
+  }
+}
+
+class Game{
+  constructor(){
+    this.player1 = new Player("p1Idle")
+    this.state = 1
+    this.map = []
+    this.mapAdds = []
+    this.sprites = []
+    this.cameraX = WIDTH/2
+    this.cameraY = HEIGHT/2
+    this.tileSize = 50 
+  }
+  setup(){
+    this.genMap(10, 10);
+    setInterval(this.player1.incrementFrame(1,2), 100);
+  }
   drawMap(){
      let cameraMinX = Math.floor((this.cameraX-WIDTH/2)/this.tileSize);
     let cameraMinY = Math.floor((this.cameraY-WIDTH/2)/this.tileSize);
