@@ -78,6 +78,7 @@ class Player{
   }
   
   draw(x, y){
+    ctx.imageSmoothingEnabled = false													
     ctx.drawImage(this.image,0, 128*this.frameX, 128, 128, x, y, this.width, this.height);
     
   }
@@ -159,7 +160,8 @@ class Game{
     setInterval(this.player1.incrementFrame(1,2), 100);
   }
   drawMap(){
-     let cameraMinX = Math.floor((this.cameraX-WIDTH/2)/this.tileSize);
+    ctx.imageSmoothingEnabled = false
+    let cameraMinX = Math.floor((this.cameraX-WIDTH/2)/this.tileSize);
     let cameraMinY = Math.floor((this.cameraY-WIDTH/2)/this.tileSize);
     
     for(let i = cameraMinX; i < Math.min(this.map.length, cameraMinX+this.tileSize+1); i++){
