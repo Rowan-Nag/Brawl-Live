@@ -100,7 +100,7 @@ MAPS = {
 
   }
 }
-var collision(a, b){
+function collision(a, b){
   return (a.x < b.x + b.width &&
    a.x + a.width > b.x &&
    a.y < b.y + b.height &&
@@ -177,17 +177,20 @@ class Player{
     this.facing = Math.atan2(this.y-yTemp, this.x-xTemp)
     for(let i = 0; i <game.mapCollision.length; i++){
       if(collide({x:this.x+dx,y:this.y,width:this.width,height:this.height}, game.mapCollision[i])){
-        if(dx < 0):
-          this.x = game.mapCollision[i].x+game.mapCollision[i].width+2;
-        if(dx > 0):
-          this.x = game.mapCollision[i].x-this.width-2
+        if(dx < 0){
+          this.x = game.mapCollision[i].x+game.mapCollision[i].width+2;}
+        if(dx > 0){
+          this.x = game.mapCollision[i].x-this.width-2}
+        console.log('collide horizontally')
       }
       if(collide({x:this.x,y:this.y+dy,width:this.width,height:this.height}, game.mapCollision[i])){
-        if(dy < 0):
-          this.y = game.mapCollision[i].y+game.mapCollision[i].height+2;
-        if(dy > 0):
-          this.y = game.mapCollision[i].y-this.height-2
+        if(dy < 0){
+          this.y = game.mapCollision[i].y+game.mapCollision[i].height+2;}
+        if(dy > 0){
+          this.y = game.mapCollision[i].y-this.height-2}
+        console.log('collide vertically')
       }
+
     }
 
     if(this.x < 0){
