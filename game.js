@@ -176,14 +176,14 @@ class Player{
     let dx = this.x-xTemp
     this.facing = Math.atan2(this.y-yTemp, this.x-xTemp)
     for(let i = 0; i <game.mapCollision.length; i++){
-      if(collide({x:this.x+dx,y:this.y,width:this.width,height:this.height}, game.mapCollision[i])){
+      if(collision({x:this.x+dx,y:this.y,width:this.width,height:this.height}, game.mapCollision[i])){
         if(dx < 0){
           this.x = game.mapCollision[i].x+game.mapCollision[i].width+2;}
         if(dx > 0){
           this.x = game.mapCollision[i].x-this.width-2}
         console.log('collide horizontally')
       }
-      if(collide({x:this.x,y:this.y+dy,width:this.width,height:this.height}, game.mapCollision[i])){
+      if(collision({x:this.x,y:this.y+dy,width:this.width,height:this.height}, game.mapCollision[i])){
         if(dy < 0){
           this.y = game.mapCollision[i].y+game.mapCollision[i].height+2;}
         if(dy > 0){
@@ -234,7 +234,7 @@ class Game{
 	  this.map = this.listToMap(MAPS[1].tiles)
     this.mapAdds = this.listToMap(MAPS[1].adds)
     this.mapCollision = this.renderCollision(MAPS[1].collision)
-    console.log(this.map, this.mapAdds)
+    console.log(this.mapCollision, 5)
 
   }
   drawMap(map){
@@ -251,25 +251,30 @@ class Game{
     }
   }
   renderCollision(tiles){
+    console.log(tiles, tiles.length, tiles[0].length)
     let collideable = false,b = []
     for(let i = 0; i < tiles.length; i++){
 	    let c = [];
-
+      console.log('i ', i)
+      console.log(tiles[i].length)
       for(let j = 0; j < tiles[i].length; j++){
+        console.log('j ', j)
         if(tiles[i][j]===1){
           collideable = true
 				  c.push(new Tile(j*this.tileSize, i*this.tileSize, this.tileSize, this.tileSize, 'floor', 1))
-          console.log('added floor')
-          break;
+          console.log('added collision')
+
         }else{
-          b.push(new Tile(c[0].x, i*this.tileSize, c[c.length-1].x-c[0].x, this.tileSize))
+          if(c.length > 0){
+          b.push(new Tile(c[0].x, i*this.tileSize, c[c.length-1].x-c[0].x, this.tileSize))}
           c = []
           collideable = false
         }
-
+        console.log(b)
       }
 
     }
+    console.log(b)
     return b
 
   }
