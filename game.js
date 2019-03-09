@@ -211,7 +211,7 @@ class Game{
 
       for(let j = 0; j<h; j++){
         b.push(new Tile(i*this.tileSize, j*this.tileSize, this.tileSize, this.tileSize,'floor'))
-		b.push(new Tile(0,j * this.tileSize,this.tileSize,this.tileSize, 'leftTreeWall'))
+	
 
 
 
