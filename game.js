@@ -156,7 +156,17 @@ class Game{
     this.tileSize = 50
   }
   setup(){
-    this.genNewMap(10, 10);
+    //this.genNewMap(10, 10);
+	  this.listToMap([1,0,0,0,0,0,0,0,1],
+			[1,0,0,0,0,0,0,0,1],
+			[1,0,0,0,0,0,0,0,1],
+			[1,0,0,0,0,0,0,0,1],
+			[1,0,0,0,0,0,0,0,1],
+			[1,0,0,0,0,0,0,0,1],
+			[1,0,0,0,0,0,0,0,1],
+			[1,0,0,0,0,0,0,0,1],
+			[1,0,0,0,0,0,0,0,1],
+			[1,0,0,0,0,0,0,0,1],)
     setInterval(this.player1.incrementFrame(1,2), 100);
   }
   drawMap(){
@@ -179,7 +189,7 @@ class Game{
       for(let j = 0; j<h; j++){
         b.push(new Tile(i*this.tileSize, j*this.tileSize, this.tileSize, this.tileSize,'floor'))
 		b.push(new Tile(0,j * this.tileSize,this.tileSize,this.tileSize, 'leftTreeWall'))
-		b.push(new Tile(450,j * this.tileSize, this.tileSize, this.tileSize, 'rightTreeWall'))
+		
 
 
       }
@@ -205,12 +215,14 @@ class Game{
 			  case 0:
 				  b.push(j*this.tileSize, i*this.tileSize, this.tileSize, this.tileSize, 'floor')
 			  case 1:
-				  b.push(1,1,this.tileSize, this.tileSize, 'leftTreeWall')
-			  
+				  b.push(j*this.tileSize, i*this.tileSize, this.tileSize, this.tileSize, 'leftTreeWall')
 				  
           }
+	      
       }
+    a.push(b)
     }
+	this.map = a
   }
 
 
