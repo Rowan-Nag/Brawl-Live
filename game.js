@@ -95,7 +95,7 @@ MAPS = {
       [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
       [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1]],
 
-      
+
 
 
   }
@@ -202,6 +202,7 @@ class Game{
     this.state = 1
     this.map = []
     this.mapAdds = []
+    this.mapCollision = []
     this.sprites = []
     this.cameraX = WIDTH/2
     this.cameraY = HEIGHT/2
@@ -211,6 +212,7 @@ class Game{
     //this.genNewMap(10, 10);
 	  this.map = this.listToMap(MAPS[1].tiles)
     this.mapAdds = this.listToMap(MAPS[1].adds)
+    this.mapCollision = this.renderCollision(MAPS[1].collision)
     console.log(this.map, this.mapAdds)
 
   }
@@ -227,7 +229,29 @@ class Game{
       }
     }
   }
+  renderCollision(tiles){
+    let collideable = false,b = []
+    for(let i = 0; i < tiles.length; i++){
+	    let c = [];
 
+      for(let j = 0; j < tiles[i].length; j++){
+        if(tiles[i][j]===1){
+          collideable = true
+				  c.push(new Tile(j*this.tileSize, i*this.tileSize, this.tileSize, this.tileSize, 'floor', 1))
+          console.log('added floor')
+          break;
+        }else{
+          b.push(new Tile(c[0].x, i*this.tileSize, c[c.length-1].x-c[0].x, this.tileSize))
+          c = []
+          collideable = false
+        }
+
+      }
+
+    }
+    return b
+
+  }
   genNewMap(w, h){
     let a = [];
 
@@ -235,7 +259,7 @@ class Game{
       let b = [];
 
       for(let j = 0; j<h; j++){
-        b.push(new Tile(i*this.tileSize, j*this.tileSize, this.tileSize, this.tileSize,'floor'))
+        b.push(new Tile(i*this.tileSize, j*this.tileSize, this.tileSize, this.tileSize,'floor', 0))
 
 
 
@@ -262,15 +286,15 @@ class Game{
 
 
 			  case 0:
-				  b.push(new Tile(j*this.tileSize, i*this.tileSize, this.tileSize, this.tileSize, 'floor'))
+				  b.push(new Tile(j*this.tileSize, i*this.tileSize, this.tileSize, this.tileSize, 'floor', 0))
           console.log('added floor')
           break;
 			  case 1:
-				  b.push(new Tile(j*this.tileSize, i*this.tileSize, this.tileSize, this.tileSize, 'leftTreeWall'))
+				  b.push(new Tile(j*this.tileSize, i*this.tileSize, this.tileSize, this.tileSize, 'leftTreeWall', 0))
           console.log('added leftTreeWall')
           break;
         case 2:
-        b.push(new Tile(j*this.tileSize, i*this.tileSize, this.tileSize, this.tileSize, 'rightTreeWall'))
+        b.push(new Tile(j*this.tileSize, i*this.tileSize, this.tileSize, this.tileSize, 'rightTreeWall', 0))
         console.log('added rightTreeWall')
           }
 
