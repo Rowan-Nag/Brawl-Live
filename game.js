@@ -204,8 +204,9 @@ class Game{
 	
   listToMap(tiles){
 	  
-    let a = 0, b = 0
+    let a = [];
     for(let i = 0; i < tiles.length; i++){
+	    let b = [];
       for(let j = 0; j < tiles[i].length; j++){
           switch(tiles[j][i]){
             //Tile Class: X, Y, Width, Height, Type (same as image id in html)
