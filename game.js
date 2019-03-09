@@ -49,7 +49,34 @@ var requestInterval = function (fn, delay) {
   handle.value = requestAnimFrame(loop);
   return handle;
 };
+MAPS = {
+  1:{
+    tiles:[
+    [0,0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0,0]],
+    adds:[
+      [1,-1,-1,-1,-1,-1,-1,-1,-1,2],
+      [1,-1,-1,-1,-1,-1,-1,-1,-1,2],
+      [1,-1,-1,-1,-1,-1,-1,-1,-1,2],
+      [1,-1,-1,-1,-1,-1,-1,-1,-1,2],
+      [1,-1,-1,-1,-1,-1,-1,-1,-1,2],
+      [1,-1,-1,-1,-1,-1,-1,-1,-1,2],
+      [1,-1,-1,-1,-1,-1,-1,-1,-1,2],
+      [1,-1,-1,-1,-1,-1,-1,-1,-1,2],
+      [1,-1,-1,-1,-1,-1,-1,-1,-1,2],
+      [1,-1,-1,-1,-1,-1,-1,-1,-1,2]]
 
+
+  }
+}
 
 class Tile{
   constructor(x, y, width, height, type, collision){
@@ -157,29 +184,25 @@ class Game{
   }
   setup(){
     //this.genNewMap(10, 10);
-	  this.listToMap([1,0,0,0,0,0,0,0,1],
-			[1,0,0,0,0,0,0,0,1],
-			[1,0,0,0,0,0,0,0,1],
-			[1,0,0,0,0,0,0,0,1],
-			[1,0,0,0,0,0,0,0,1],
-			[1,0,0,0,0,0,0,0,1],
-			[1,0,0,0,0,0,0,0,1],
-			[1,0,0,0,0,0,0,0,1],
-			[1,0,0,0,0,0,0,0,1],
-			[1,0,0,0,0,0,0,0,1],)
-    setInterval(this.player1.incrementFrame(1,2), 100);
+	  this.map = this.listToMap(MAPS[1].tiles)
+    this.mapAdds = this.listToMap(MAPS[1].adds)
+    console.log(this.map, this.mapAdds)
+
   }
-  drawMap(){
+  drawMap(map){
     ctx.imageSmoothingEnabled = false
+
     let cameraMinX = Math.floor((this.cameraX-WIDTH/2)/this.tileSize);
     let cameraMinY = Math.floor((this.cameraY-WIDTH/2)/this.tileSize);
 
-    for(let i = cameraMinX; i < Math.min(this.map.length, cameraMinX+this.tileSize+1); i++){
-      for(let j = cameraMinY; j < Math.min(this.map[i].length, cameraMinY+this.tileSize+1); j++){
-        ctx.drawImage(this.map[i][j].image, this.map[i][j].x-this.cameraX+WIDTH/2, this.map[i][j].y-this.cameraY+HEIGHT/2, this.tileSize, this.tileSize)
+
+    for(let i = cameraMinX; i < Math.min(map.length, cameraMinX+this.tileSize+1); i++){
+      for(let j = cameraMinY; j < Math.min(map[i].length, cameraMinY+this.tileSize+1); j++){
+        ctx.drawImage(map[i][j].image, map[i][j].x-this.cameraX+WIDTH/2, map[i][j].y-this.cameraY+HEIGHT/2, this.tileSize, this.tileSize)
       }
     }
   }
+
   genNewMap(w, h){
     let a = [];
 
@@ -189,7 +212,7 @@ class Game{
       for(let j = 0; j<h; j++){
         b.push(new Tile(i*this.tileSize, j*this.tileSize, this.tileSize, this.tileSize,'floor'))
 		b.push(new Tile(0,j * this.tileSize,this.tileSize,this.tileSize, 'leftTreeWall'))
-		
+
 
 
       }
@@ -199,36 +222,43 @@ class Game{
 
     this.map = a
   }
-	
-  
-	
+
+
+
   listToMap(tiles){
-	  
-    let a = [];
+    console.log(tiles)
+    let target = []
     for(let i = 0; i < tiles.length; i++){
 	    let b = [];
       for(let j = 0; j < tiles[i].length; j++){
-          switch(tiles[j][i]){
+          switch(tiles[i][j]){
             //Tile Class: X, Y, Width, Height, Type (same as image id in html)
-				  
-			  
-				  
+
+
+
 			  case 0:
-				  b.push(j*this.tileSize, i*this.tileSize, this.tileSize, this.tileSize, 'floor')
+				  b.push(new Tile(j*this.tileSize, i*this.tileSize, this.tileSize, this.tileSize, 'floor'))
+          console.log('added floor')
+          break;
 			  case 1:
-				  b.push(j*this.tileSize, i*this.tileSize, this.tileSize, this.tileSize, 'leftTreeWall')
-				  
+				  b.push(new Tile(j*this.tileSize, i*this.tileSize, this.tileSize, this.tileSize, 'leftTreeWall'))
+          console.log('added leftTreeWall')
+          break;
+        case 2:
+        b.push(new Tile(j*this.tileSize, i*this.tileSize, this.tileSize, this.tileSize, 'rightTreeWall'))
+        console.log('added rightTreeWall')
           }
-	      
+
       }
-    a.push(b)
+    target.push(b)
     }
-	this.map = a
+
+  return target
   }
 
 
   drawSprites(){
-	  
+
     for(let i = 0; i < this.sprites.length; i++){
       this.sprites[i].draw();
     }
@@ -241,7 +271,8 @@ class Game{
         break;
       case 1:
         this.player1.move()
-        this.drawMap();
+        this.drawMap(this.map);
+        this.drawMap(this.mapAdds)
         this.drawSprites();
     }
   }
@@ -255,8 +286,9 @@ function update(){
   game.stateEngine()
 }
 function updateTicks(){
-  console.log(ticks)
+
   ticks += 1
 }
+
 var tickCount = setInterval(updateTicks, 100)
 requestInterval(update, frameDelay)
