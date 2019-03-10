@@ -102,6 +102,25 @@ MAPS = {
   }
 }
 
+var peer = new Peer;
+var peerId, conn, connections = [];
+peer.on('open', function(id) {
+  console.log('My peer ID is: ' + id);
+  peerId = id
+});
+peer.on('connection', function(conn){
+  console.log('hosting ', conn.id)
+  connections.push(conn)
+  conn.on('data', function(data) {
+    console.log('recieved ', data, ' from ', conn.id)
+  });
+})
+
+
+function connectToId(id){
+  return peer.connect(id)
+}
+
 
 function collision(a, b){
   return (a.x < b.x + b.width &&
@@ -238,7 +257,7 @@ class Game{
 	  this.map = this.listToMap(MAPS[1].tiles)
     this.mapAdds = this.listToMap(MAPS[1].adds)
     this.mapCollision = this.renderCollision(MAPS[1].collision)
-    console.log(this.mapCollision, 5)
+
 
   }
   drawMap(map){
@@ -255,19 +274,19 @@ class Game{
     }
   }
   renderCollision(tiles){
-    console.log(tiles, tiles.length, tiles[0].length)
+
     let collideable = false,b = []
     for(let i = 0; i < tiles.length; i++){
 	    let c = [];
 
-      console.log('i ', i)
-      console.log(tiles[i].length)
+
+
       for(let j = 0; j < tiles[i].length; j++){
-        console.log('j ', j)
+
         if(tiles[i][j]===1){
           collideable = true
 				  c.push(new Tile(j*this.tileSize/2, i*this.tileSize/2, this.tileSize/2, this.tileSize/2, 'floor', 1))
-          console.log('added collision')
+
 
         }else{
           if(c.length > 0){
@@ -344,7 +363,7 @@ class Game{
 			  case 6:
 				  b.push(new Tile(j*this.tileSize, i*this.tileSize, this.tileSize, this.tileSize, 'frontRightRockWall', 0))
 			  	break;
-			  
+
 			  case 7:
 				  b.push(new Tile(j*this.tileSize, i*this.tileSize, this.tileSize, this.tileSize, 'topGrass', 0))
 			  	break;

@@ -24,9 +24,9 @@
   <img id ="p1Up" src="Assets/Sprite-Fighter-1-Up.png">
   <img id ="p1Down" src="Assets/Sprite-Fighter-1-Down.png">
   <img id ="p1Idle" src="Assets/Sprite-Fighter-1-Down.png">
-	
+
   <img id="floor" src="Assets/DirtyGround.png">
-	
+
   <img id="topGrass" src="Assets/TopGrass.png">
 
 
@@ -44,16 +44,19 @@
 
 
 </canvas>
-<p>
-<input id="peerId" type="text"> </input>
+<p> <input id="peerId" type="text"> </input><button onClick="conn = connectToId(document.getElementById('peerId').value)"> Connect </button> <p>
+	<button onClick="conn.send(':hypers:')"> HYPERS </button>
 <button width="200px" height="40px" onClick="game.genNewMap(200, 200)"> Big Map</button>
 </html>
 
 <link href="new.css" rel="stylesheet" type="text/css">
-
-<script src="game.js"></script>
 <!--PEER.JS right here -->
 <script src="https://cdn.jsdelivr.net/npm/peerjs@0.3.20/dist/peer.min.js"></script>
+
+
+<script src="game.js"></script>
+
+
 
 <footer>
 	<p align="center">Created by: @Protochicken and @atherna</p>
