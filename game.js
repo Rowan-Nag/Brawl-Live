@@ -102,7 +102,6 @@ MAPS = {
   }
 }
 
-var peer = new Peer();
 
 function collision(a, b){
   return (a.x < b.x + b.width &&
