@@ -55,10 +55,10 @@ MAPS = {
     tiles:[
     [1,1,1,1,1,1,1,1,1,1],
     [1,1,1,1,1,1,1,1,1,1],
-    [1,1,1,1,1,1,1,1,1,1],
-    [1,1,1,1,1,1,1,1,1,1],
-    [1,1,1,1,1,1,1,1,1,1],
-    [1,1,7,7,7,7,1,1,1,1],
+    [1,1,13,8,8,14,1,1,1,1],
+    [1,1,10,1,1,9,1,1,1,1],
+    [1,1,10,1,1,9,1,1,1,1],
+    [1,1,11,7,7,12,1,1,1,1],
     [1,1,1,1,1,1,1,1,1,1],
     [1,1,1,1,1,1,1,1,1,1],
     [1,1,1,1,1,1,1,1,1,1],
@@ -337,6 +337,7 @@ class Game{
             //Tile Class: X, Y, Width, Height, Type (same as image id in html)
 
 
+			  
 			  case 0:
 				  break;
 
@@ -363,10 +364,43 @@ class Game{
 			  case 6:
 				  b.push(new Tile(j*this.tileSize, i*this.tileSize, this.tileSize, this.tileSize, 'frontRightRockWall', 0))
 			  	break;
-
+			  
 			  case 7:
 				  b.push(new Tile(j*this.tileSize, i*this.tileSize, this.tileSize, this.tileSize, 'topGrass', 0))
 			  	break;
+				  
+			  case 8:
+				  b.push(new Tile(j*this.tileSize, i*this.tileSize, this.tileSize, this.tileSize, 'bottomGrass', 0))
+			  	break;
+				  
+			  case 9:
+				  b.push(new Tile(j*this.tileSize, i*this.tileSize, this.tileSize, this.tileSize, 'leftGrass', 0))
+			  	break;
+			  
+			  case 10:
+				  b.push(new Tile(j*this.tileSize, i*this.tileSize, this.tileSize, this.tileSize, 'rightGrass', 0))
+			  	break;
+				  
+			  case 11:
+				  b.push(new Tile(j*this.tileSize, i*this.tileSize, this.tileSize, this.tileSize, 'topRightGrass', 0))
+			  	break;
+				  
+			  case 12:
+				  b.push(new Tile(j*this.tileSize, i*this.tileSize, this.tileSize, this.tileSize, 'topLeftGrass', 0))
+			  	break;
+				  
+			  case 13:
+				  b.push(new Tile(j*this.tileSize, i*this.tileSize, this.tileSize, this.tileSize, 'bottomRightGrass', 0))
+			  	break;
+				  
+			  case 14:
+				  b.push(new Tile(j*this.tileSize, i*this.tileSize, this.tileSize, this.tileSize, 'bottomLeftGrass', 0))
+			  	break;
+				  
+			  case 15:
+				  b.push(new Tile(j*this.tileSize, i*this.tileSize, this.tileSize, this.tileSize, 'grass', 0))
+			  	break;
+				  
 
 
 
