@@ -77,12 +77,7 @@ MAPS = {
     collision:[
       [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
       [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-      [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-      [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-      [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-      [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-      [1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-      [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+      [1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
       [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
       [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
       [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
@@ -91,6 +86,11 @@ MAPS = {
       [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
       [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
       [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+      [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+      [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+      [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+      [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+      [1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,1],
       [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
       [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
       [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
@@ -257,26 +257,30 @@ class Game{
     let collideable = false,b = []
     for(let i = 0; i < tiles.length; i++){
 	    let c = [];
+
       console.log('i ', i)
       console.log(tiles[i].length)
       for(let j = 0; j < tiles[i].length; j++){
         console.log('j ', j)
         if(tiles[i][j]===1){
           collideable = true
-				  c.push(new Tile(j*this.tileSize, i*this.tileSize, this.tileSize, this.tileSize, 'floor', 1))
+				  c.push(new Tile(j*this.tileSize/2, i*this.tileSize/2, this.tileSize/2, this.tileSize/2, 'floor', 1))
           console.log('added collision')
 
         }else{
           if(c.length > 0){
-          b.push(new Tile(c[0].x, i*this.tileSize, c[c.length-1].x-c[0].x+this.tileSize, this.tileSize))}
+          b.push(new Tile(c[0].x, i*this.tileSize/2, c[c.length-1].x-c[0].x+this.tileSize/2, this.tileSize/2))
+        }
           c = []
           collideable = false
         }
-        console.log(b)
+      if(collideable){
+        b.push(new Tile(c[0].x, i*this.tileSize/2, c[c.length-1].x-c[0].x+this.tileSize/2, this.tileSize/2))
+      }
       }
 
     }
-    console.log(b)
+
     return b
 
   }
@@ -366,7 +370,8 @@ class Game{
       case 1:
         this.player1.move()
         this.drawMap(this.map);
-        this.drawMap(this.mapAdds)
+        this.drawMap(this.mapAdds);
+        this.drawMap(this.mapCollision)
         this.drawSprites();
     }
   }
