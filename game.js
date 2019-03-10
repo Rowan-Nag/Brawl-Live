@@ -53,35 +53,35 @@ var requestInterval = function (fn, delay) {
 MAPS = {
   1:{
     tiles:[
-    [0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0],
-    [0,0,0,0,0,0,0,0,0,0]],
+    [1,1,1,1,1,1,1,1,1,1],
+    [1,1,1,1,1,1,1,1,1,1],
+    [1,1,1,1,1,1,1,1,1,1],
+    [1,1,1,1,1,1,1,1,1,1],
+    [1,1,1,1,1,1,1,1,1,1],
+    [1,1,1,1,1,1,1,1,1,1],
+    [1,1,1,1,1,1,1,1,1,1],
+    [1,1,1,1,1,1,1,1,1,1],
+    [1,1,1,1,1,1,1,1,1,1],
+    [1,1,1,1,1,1,1,1,1,1]],
     adds:[
-      [1,-1,-1,-1,-1,-1,-1,-1,-1,2],
-      [1,-1,-1,-1,-1,-1,-1,-1,-1,2],
-      [1,-1,-1,-1,-1,-1,-1,-1,-1,2],
-      [1,-1,-1,-1,-1,-1,-1,-1,-1,2],
-      [1,-1,-1,-1,-1,-1,-1,-1,-1,2],
-      [1,-1,-1,-1,-1,-1,-1,-1,-1,2],
-      [1,-1,-1,-1,-1,-1,-1,-1,-1,2],
-      [1,-1,-1,-1,-1,-1,-1,-1,-1,2],
-      [1,-1,-1,-1,-1,-1,-1,-1,-1,2],
-      [1,-1,-1,-1,-1,-1,-1,-1,-1,2]],
+      [5,4,4,4,4,4,4,4,4,6],
+      [3,0,0,0,0,0,0,0,0,2],
+      [3,0,0,0,0,0,0,0,0,2],
+      [3,0,0,0,0,0,0,0,0,2],
+      [3,0,0,0,0,0,0,0,0,2],
+      [3,0,0,0,0,0,0,0,0,2],
+      [3,0,0,0,0,0,0,0,0,2],
+	  [3,0,0,0,0,0,0,0,0,2],
+      [3,0,0,0,0,0,0,0,0,2],
+      [3,0,0,0,0,0,0,0,0,2]],
       collision:[
+      [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+      [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
       [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
       [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
       [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
       [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-      [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-      [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-      [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+      [1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
       [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
       [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
       [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
@@ -311,24 +311,36 @@ class Game{
             //Tile Class: X, Y, Width, Height, Type (same as image id in html)
 
 
-
 			  case 0:
-				  b.push(new Tile(j*this.tileSize, i*this.tileSize, this.tileSize, this.tileSize, 'floor', 0))
-          console.log('added floor')
-          break;
+				  break;
+				  
 			  case 1:
-				  b.push(new Tile(j*this.tileSize, i*this.tileSize, this.tileSize, this.tileSize, 'leftTreeWall', 0))
-          console.log('added leftTreeWall')
-          break;
-        case 2:
-          b.push(new Tile(j*this.tileSize, i*this.tileSize, this.tileSize, this.tileSize, 'rightTreeWall', 0))
-          console.log('added rightTreeWall')
-          break;
-        case 3:
-          b.push(new Tile(j*this.tileSize, i*this.tileSize, this.tileSize, this.tileSize, 'backRockWall', 0))
-          console.log('added backRockWall')
-          break;
-          }
+				  b.push(new Tile(j*this.tileSize, i*this.tileSize, this.tileSize, this.tileSize, 'floor', 0))
+			  	break;
+				  
+			  case 2:
+				  b.push(new Tile(j*this.tileSize, i*this.tileSize, this.tileSize, this.tileSize, 'rightRockWall', 0))
+			  	break;
+				  
+			  case 3:
+				  b.push(new Tile(j*this.tileSize, i*this.tileSize, this.tileSize, this.tileSize, 'leftRockWall', 0))
+			  	break;
+				  
+			  case 4:
+				  b.push(new Tile(j*this.tileSize, i*this.tileSize, this.tileSize, this.tileSize, 'frontRockWall', 0))
+			  	break;
+				  
+			  case 5:
+				  b.push(new Tile(j*this.tileSize, i*this.tileSize, this.tileSize, this.tileSize, 'frontLeftRockWall', 0))
+			  	break;
+				  
+			  case 6:
+				  b.push(new Tile(j*this.tileSize, i*this.tileSize, this.tileSize, this.tileSize, 'frontRightRockWall', 0))
+			  	break;
+				  
+			  
+				  
+			  }
 
       }
     target.push(b)
