@@ -132,23 +132,20 @@ class Player{
     this.width = 32
     this.height =42
     this.frameX = 0
+    this.effects = {
+      walking:true,
+    }
   }
 
   draw(x, y){
     ctx.imageSmoothingEnabled = false
-    ctx.drawImage(this.image,0, 32*this.frameX, 32, 42, x, y, this.width, this.height);
+    ctx.drawImage(this.image,32*this.frameX, 0, 32, 42, x, y, this.width, this.height);
 
   }
-  incrementFrame(numFrames, delayAmount) {
-    if (this.delay < delayAmount) {
-      this.delay += 1;
-    } else {
-      if (this.frameX < numFrames ) {
-        this.frameX += 1;
-      } else {
-        this.frameX = 0;
-        this.delay = 0;
-      }
+  incrementFrame(numFrames) {
+    this.frameX += 1
+    if(this.frameX >= numFrames){
+      this.frameX -= numFrames
     }
   }
 
@@ -158,9 +155,7 @@ class Player{
     if(keys.a in keysDown){
       this.x -= this.speed
       this.image = document.getElementById("p1Left")
-      if(ticks%5===0){
-        this.incrementFrame()
-      }
+
     }
     if(keys.d in keysDown){
       this.x += this.speed
@@ -176,6 +171,11 @@ class Player{
     }
     let dy = this.y-yTemp
     let dx = this.x-xTemp
+    if(dy == 0 && dx == 0){
+      this.effects.walking = false
+    }else{
+      this.effects.walking = true
+    }
     this.facing = Math.atan2(this.y-yTemp, this.x-xTemp)
     for(let i = 0; i <game.mapCollision.length; i++){
       if(collision({x:this.x,y:this.y-dy,width:this.width,height:this.height}, game.mapCollision[i])){
@@ -382,6 +382,9 @@ function update(){
 function updateTicks(){
 
   ticks += 1
+  if(game.player1.effects.walking && ticks%2 ==0){
+    game.player1.incrementFrame(2)
+  }
 }
 
 var tickCount = setInterval(updateTicks, 100)
