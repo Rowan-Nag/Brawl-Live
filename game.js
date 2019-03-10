@@ -71,10 +71,10 @@ MAPS = {
       [3,0,0,0,0,0,0,0,0,2],
       [3,0,0,0,0,0,0,0,0,2],
       [3,0,0,0,0,0,0,0,0,2],
-	  [3,0,0,0,0,0,0,0,0,2],
+	    [3,0,0,0,0,0,0,0,0,2],
       [3,0,0,0,0,0,0,0,0,2],
       [3,0,0,0,0,0,0,0,0,2]],
-      collision:[
+    collision:[
       [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
       [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
       [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
@@ -129,13 +129,14 @@ class Player{
     this.y = HEIGHT/2;
     this.speed = 4
     this.facing = 0
-    this.width = 50
-    this.height =50
+    this.width = 32
+    this.height =42
+    this.frameX = 0
   }
 
   draw(x, y){
     ctx.imageSmoothingEnabled = false
-    ctx.drawImage(this.image,0, 32*this.frameX, 32, 32, x, y, this.width, this.height);
+    ctx.drawImage(this.image,0, 32*this.frameX, 32, 42, x, y, this.width, this.height);
 
   }
   incrementFrame(numFrames, delayAmount) {
@@ -177,14 +178,14 @@ class Player{
     let dx = this.x-xTemp
     this.facing = Math.atan2(this.y-yTemp, this.x-xTemp)
     for(let i = 0; i <game.mapCollision.length; i++){
-      if(collision({x:this.x+dx,y:this.y,width:this.width,height:this.height}, game.mapCollision[i])){
+      if(collision({x:this.x,y:this.y-dy,width:this.width,height:this.height}, game.mapCollision[i])){
         if(dx < 0){
           this.x = game.mapCollision[i].x+game.mapCollision[i].width+2;}
         if(dx > 0){
           this.x = game.mapCollision[i].x-this.width-2}
         console.log('collide horizontally')
       }
-      if(collision({x:this.x,y:this.y+dy,width:this.width,height:this.height}, game.mapCollision[i])){
+      if(collision({x:this.x-dx,y:this.y,width:this.width,height:this.height}, game.mapCollision[i])){
         if(dy < 0){
           this.y = game.mapCollision[i].y+game.mapCollision[i].height+2;}
         if(dy > 0){
@@ -313,33 +314,33 @@ class Game{
 
 			  case 0:
 				  break;
-				  
+
 			  case 1:
 				  b.push(new Tile(j*this.tileSize, i*this.tileSize, this.tileSize, this.tileSize, 'floor', 0))
 			  	break;
-				  
+
 			  case 2:
 				  b.push(new Tile(j*this.tileSize, i*this.tileSize, this.tileSize, this.tileSize, 'rightRockWall', 0))
 			  	break;
-				  
+
 			  case 3:
 				  b.push(new Tile(j*this.tileSize, i*this.tileSize, this.tileSize, this.tileSize, 'leftRockWall', 0))
 			  	break;
-				  
+
 			  case 4:
 				  b.push(new Tile(j*this.tileSize, i*this.tileSize, this.tileSize, this.tileSize, 'frontRockWall', 0))
 			  	break;
-				  
+
 			  case 5:
 				  b.push(new Tile(j*this.tileSize, i*this.tileSize, this.tileSize, this.tileSize, 'frontLeftRockWall', 0))
 			  	break;
-				  
+
 			  case 6:
 				  b.push(new Tile(j*this.tileSize, i*this.tileSize, this.tileSize, this.tileSize, 'frontRightRockWall', 0))
 			  	break;
-				  
-			  
-				  
+
+
+
 			  }
 
       }
