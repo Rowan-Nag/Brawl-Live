@@ -21,6 +21,7 @@ var keys = {down: 40,
     frameRate = 1/60,
     frameDelay = frameRate*1000
 
+
 addEventListener("keydown", function (e) {
   keysDown[e.keyCode] = true;
 }, false);
@@ -134,7 +135,7 @@ class Player{
 
   draw(x, y){
     ctx.imageSmoothingEnabled = false
-    ctx.drawImage(this.image,0, 128*this.frameX, 128, 128, x, y, this.width, this.height);
+    ctx.drawImage(this.image,0, 32*this.frameX, 32, 32, x, y, this.width, this.height);
 
   }
   incrementFrame(numFrames, delayAmount) {
@@ -266,7 +267,7 @@ class Game{
 
         }else{
           if(c.length > 0){
-          b.push(new Tile(c[0].x, i*this.tileSize, c[c.length-1].x-c[0].x, this.tileSize))}
+          b.push(new Tile(c[0].x, i*this.tileSize, c[c.length-1].x-c[0].x+this.tileSize, this.tileSize))}
           c = []
           collideable = false
         }
