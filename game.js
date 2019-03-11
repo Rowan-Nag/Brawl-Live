@@ -70,7 +70,11 @@ var requestInterval = function (fn, delay) {
 var mid = document.getElementById('middleP')
 
 var peer = new Peer;
+<<<<<<< HEAD
 var peerId, mainConn, connections = [], hosting = false, connPosition = -2;
+=======
+var peerId, mainConn, connections = [], hosting, connPosition = -2;
+>>>>>>> 9e5768d020ac5b7386107f8138fbaeb41f74eb33
 
 
 peer.on('open', function(id) {
@@ -89,11 +93,17 @@ peer.on('connection', function(conn){
     });
   }
   else if(connPosition <0){
+<<<<<<< HEAD
     console.log('recieved ', data, ' from ', conn.id)
     conn.on('data', function(data){
       if(data[0]==0){
         connPosition = data[1]
         mid.innerHTML=connPosition.toString();
+=======
+    conn.on('data', function(data){
+      if(data[0]==0){
+        connPosition = data[1]
+>>>>>>> 9e5768d020ac5b7386107f8138fbaeb41f74eb33
         console.log("position: " + connPosition.toString());
       }
     })
@@ -101,8 +111,11 @@ peer.on('connection', function(conn){
 
 })
 
+<<<<<<< HEAD
 
 
+=======
+>>>>>>> 9e5768d020ac5b7386107f8138fbaeb41f74eb33
 function sendData(data, recievers){
   for(let i = 0; i < recievers.length; i++){
     recievers[i].send(data)
@@ -131,7 +144,10 @@ function hostButton(){
     game.switchMenu(game.menus.host)
 }
 function joinButton(){
+<<<<<<< HEAD
   hosting = false
+=======
+>>>>>>> 9e5768d020ac5b7386107f8138fbaeb41f74eb33
     game.switchMenu(game.menus.join)
     mid.innerHTML = "put your friends ID in the box to the left and click connect!"
 }
@@ -344,6 +360,7 @@ class Player{
 class Game{
   constructor(){
     this.player1 = new Player("p1Idle","playerOneBasicAttack")
+<<<<<<< HEAD
     this.hostedPlayers = [];
     this.state = 0;
     this.map = [];
@@ -355,6 +372,18 @@ class Game{
     this.tileSize = 50;
     this.menus = {};
     this.currentMenu = [];
+=======
+    this.state = 0
+    this.map = []
+    this.mapAdds = []
+    this.mapCollision = []
+    this.sprites = []
+    this.cameraX = WIDTH/2
+    this.cameraY = HEIGHT/2
+    this.tileSize = 50
+    this.menus = {}
+    this.currentMenu = []
+>>>>>>> 9e5768d020ac5b7386107f8138fbaeb41f74eb33
   }
   setup(){
     //this.genNewMap(10, 10);
@@ -579,7 +608,11 @@ class Game{
         ctx.fillRect(0,0,WIDTH,HEIGHT)
         this.drawMenu(this.currentMenu);
         break;
+<<<<<<< HEAD
       case 1: //joining
+=======
+      case 1:
+>>>>>>> 9e5768d020ac5b7386107f8138fbaeb41f74eb33
         this.player1.mouseAngle();
         this.player1.move();
         this.drawMap(this.map);
