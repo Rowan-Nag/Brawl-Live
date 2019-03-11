@@ -20,9 +20,9 @@
 
 	<img id="Nbutton" src="Assets/BaseButton.png">
 	<img id="NbuttonGlow" src="Assets/BaseButtonReversed.png">
-	
 
-  <img id ="playerOneBasicAttack" src="Assets/PlayerOneBasicAttack.png">
+	<img id ="playerOneBasicAttack" src="Assets/PlayerOneBasicAttack.png">
+
   <img id ="p1Left" src="Assets/Sprite-Fighter-1-Left.png">
   <img id ="p1Right" src="Assets/Sprite-Fighter-1-Right.png">
   <img id ="p1Up" src="Assets/Sprite-Fighter-1-Up.png">
@@ -58,8 +58,8 @@
 </canvas>
 </div>
 <p align="center" id ="middleP"> &nbsp
-<p> <input id="peerId" type="text"> </input><button style="position:absolute;" onClick="conn = connectToId(document.getElementById('peerId').value)"> Connect </button> <p>
-	<button onClick="conn.send(':hypers:')"> HYPERS </button>
+<p> <input id="peerId" type="text"> </input><button style="position:absolute;" onClick="mainConn = connectToId(document.getElementById('peerId').value)"> Connect </button> <p>
+	<button onClick="mainConn.send(':hypers:')"> HYPERS </button>
 <button disabled = "true" width="200px" height="40px" onClick="game.genNewMap(200, 200)"> Big Map</button>
 </html>
 
