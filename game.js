@@ -373,6 +373,7 @@ class Game{
   stateEngine(){
     switch(this.state){
       case 0:
+
         break;
       case 1:
         this.player1.move()
