@@ -84,6 +84,19 @@ function hostGame(){
 function joinGame(){
   console.log('joining')
 }
+
+
+//Button functions
+function hostButton(){
+    var mid = document.getElementById('middleP')
+    console.log('HOSTING')
+    mid.innerHTML = "Your ID: " + peerId.toString();
+    game.switchMenu(game.menus.host)
+}
+function startButton(){
+  console.log('starting')
+  game.switchState(1)
+}
 class Tile{
   constructor(x, y, width, height, type, collision){
     this.x = x;
@@ -108,20 +121,21 @@ class menuButton{
     this.button = document.createElement('button');
     this.button.appendChild(this.text);
     this.button.style.left = x.toString()+"px";
-    this.button.style.bottom = HEIGHT-y.toString()+"px";
-    this.button.style.width = this.width;
-    this.button.style.height = this.height;
+    this.button.style.bottom = (HEIGHT-y).toString()+"px";
+    this.button.style.width = this.width.toString() + "px";
+    this.button.style.height = this.height.toString() + "px";
     this.button.classList.add('menuButton')
     this.image = document.getElementById('Nbutton')
-
+    this.buttonNum = totalMenuButtons;
     this.button.onclick=func
     console.log(this.button)
     totalMenuButtons++
     this.deactivate();
     document.getElementById('canvasDiv').appendChild(this.button)
+    document.getElementById('canvasDiv').appendChild(document.createElement('p'))
   }
-  draw(){
-    ctx.drawImage(this.image, this.x, this.y, this.width, this.height)
+  draw(x, y){
+    ctx.drawImage(this.image, x, this.y+5+this.buttonNum*64, this.width, this.height)
   }
   activate(){
     this.button.disabled = false;
@@ -234,7 +248,7 @@ class Player{
 class Game{
   constructor(){
     this.player1 = new Player("p1Idle")
-    this.state = 1
+    this.state = 0
     this.map = []
     this.mapAdds = []
     this.mapCollision = []
@@ -252,15 +266,15 @@ class Game{
     this.mapCollision = this.renderCollision(MAPS[1].collision)
     this.genMenus();
     this.currentMenu = this.menus.main
-
     this.switchMenu(this.currentMenu);
 
   }
   genMenus(){
     //x, y, width, height, text, func, font, size
     this.menus ={
-      main:[new menuButton(WIDTH/2-100, HEIGHT*2/3, 200, 50, 'Host Game', function(){hostGame()}, 'arial', 15),
-            new menuButton(WIDTH/2-100, HEIGHT*2/3-100, 200, 50, 'Join Game', function(){joinGame()}, 'arial', 15)],
+      main:[new menuButton(WIDTH/2-100, HEIGHT*1/2, 200, 50, 'Host Game', function(){hostButton()}, 'arial', 15),
+            new menuButton(WIDTH/2-100, HEIGHT*1/2+50, 200, 50, 'Join Game', function(){joinButton()}, 'arial', 15)],
+      host:[new menuButton(WIDTH/2-100, HEIGHT*1/2-50, 200, 50, 'Start Game', function(){startButton()}, 'arial', 15)]
 
     }
   }
@@ -432,28 +446,50 @@ class Game{
     for(let i = 0; i < target.length; i++){
       target[i].activate();
     }
+    this.currentMenu = target;
   }
 
   drawMenu(menu){
     for(let i = 0;i< menu.length; i++){
 
-      menu[i].draw()
+      menu[i].draw(menu[i].x, menu[i].y)
 
     }
 
   }
 
+  switchState(target){
+    ctx.clearRect(0,0,WIDTH,HEIGHT)
+    if(this.state == 0){
+      for(let i = 0; i< this.currentMenu.length; i++){
+        this.currentMenu[i].deactivate();
+      }
+    }
+    if(target == 0){
+      for(let i = 0; i< this.currentMenu.length; i++){
+        this.currentMenu = this.menus.main;
+        this.switchMenu(this.currentMenu);
+    }
+
+  }
+  this.state = target/1;
+}
+
   stateEngine(){
+
     switch(this.state){
       case 0:
+        ctx.fillRect(0,0,WIDTH,HEIGHT)
         this.drawMenu(this.currentMenu);
         break;
       case 1:
+
         this.player1.move()
         this.drawMap(this.map);
         this.drawMap(this.mapAdds);
         this.drawMap(this.mapCollision)
         this.drawSprites();
+        break;
     }
   }
 
