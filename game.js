@@ -98,6 +98,7 @@ peer.on('connection', function(conn){
 
     case 1:
       mainConn=connectToId(data[1])
+      mid.innerHTML = "All good!"
       break;
 
     case 2:
@@ -180,6 +181,7 @@ function startButton(){
 function connectButton(){
 
   mid.innerHTML = "connected";
+  mid.innerHTML = "Wait a second and then press Ping before the host starts!"
   mainConn = connectToId(document.getElementById('peerId').value)
   mainConn.send(1)
   mainConn.send([1, peerId])
@@ -190,6 +192,11 @@ function connectButton(){
 
 function singlePlayerButton(){
   game.switchState(3)
+}
+
+function changeChar(num){
+  game.player1 = new Player(num)
+  game.switchMenu(game.menus.main)
 }
 
 class Tile{
@@ -430,12 +437,15 @@ class Game{
   genMenus(){
     //x, y, width, height, text, func, font, size
     this.menus ={
-      main:[new menuButton(WIDTH/2-100, HEIGHT*1/2-50, 200, 50, 'Solo Game', function(){singlePlayerButton()}, 'arial', 15),
-            new menuButton(WIDTH/2-100, HEIGHT*1/2, 200, 50, 'Host Game', function(){hostButton()}, 'arial', 15),
-            new menuButton(WIDTH/2-100, HEIGHT*1/2+50, 200, 50, 'Join Game', function(){joinButton()}, 'arial', 15)],
-      host:[new menuButton(WIDTH/2-100, HEIGHT*1/2-100, 200, 50, 'Start Game', function(){startButton()}, 'arial', 15)],
-      join:[new menuButton(WIDTH/2-100, HEIGHT*1/2-150, 200, 50, 'Connect', function(){connectButton()}, 'arial', 15)],
-      ping:[new menuButton(WIDTH/2-100, HEIGHT*1/2-150, 200, 50, 'Ping', function(){mainConn.send([1,peerId])}, 'arial', 15)]
+      main:[new menuButton(WIDTH/2-100, HEIGHT*1/2-75, 200, 50, 'Character select', function(){game.switchMenu(game.menus.charSelect)}, 'arial', 15),
+            new menuButton(WIDTH/2-100, HEIGHT*1/2-50, 200, 50, 'Solo Game', function(){singlePlayerButton()}, 'arial', 15),
+            new menuButton(WIDTH/2-100, HEIGHT*1/2-25, 200, 50, 'Host Game', function(){hostButton()}, 'arial', 15),
+            new menuButton(WIDTH/2-100, HEIGHT*1/2, 200, 50, 'Join Game', function(){joinButton()}, 'arial', 15)],
+      host:[new menuButton(WIDTH/2-100, HEIGHT*1/2-225, 200, 50, 'Start Game', function(){startButton()}, 'arial', 15)],
+      join:[new menuButton(WIDTH/2-100, HEIGHT*1/2-250, 200, 50, 'Connect', function(){connectButton()}, 'arial', 15)],
+      ping:[new menuButton(WIDTH/2-100, HEIGHT*1/2-200, 200, 50, 'Ping', function(){mainConn.send([1,peerId])}, 'arial', 15)],
+      charSelect:[new menuButton(WIDTH/2-100, HEIGHT*1/2-500, 200, 50, 'P1', function(){changeChar(1)}, 'arial', 15),
+                  new menuButton(WIDTH/2-100, HEIGHT*1/2-350, 200, 50, 'P2', function(){changeChar(2)}, 'arial', 15),]
     }
   }
   drawMap(map){

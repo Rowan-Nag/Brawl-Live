@@ -79,6 +79,13 @@ var playerData = {
       left: "p1Left",
       right: "p1Right",
       attack: "playerOneBasicAttack"
+    },
+    2:{
+      down: "p2Down",
+      up: "p2Up",
+      left: "p2Left",
+      right: "p2Right",
+      attack: "playerOneBasicAttack"
     }
   }
 }
