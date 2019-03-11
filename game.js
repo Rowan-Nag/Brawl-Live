@@ -19,7 +19,8 @@ var keys = {down: 40,
             r: 82,},
     keysDown = {},
     frameRate = 1/60,
-    frameDelay = frameRate*1000
+    frameDelay = frameRate*1000,
+    totalMenuButtons = 0
 
 
 addEventListener("keydown", function (e) {
@@ -89,7 +90,38 @@ class Tile{
 
 
 
+class menuButton{
+  constructor(x, y, text, width, height, func, font, size){
+    this.x = x;
+    this.y = y;
+    this.text = document.createTextNode(text);
+    this.width = width;
+    this.height = height;
+    this.func = func;
+    this.button = document.createElement('button');
+    this.button.appendChild(this.text);
+    this.button.style.x = this.x;
+    this.button.style.y = this.y;
+    this.button.style.width = this.width;
+    this.button.style.height = this.height;
+    this.button.classList.add('menuButton')
+    this.image = ctx.getElementById('button')
+    totalMenuButtons++
 
+  }
+  draw(){
+    ctx.drawImage(this.image, this.x, this.y, this.width, this.height)
+  }
+  activate(){
+    this.button.disabled = false;
+    this.button.style.zIndex = 2;
+  }
+  deactivate(){
+    this.button.disabled = true;
+    this.button.style.zIndex = -2;
+  }
+
+}
 
 class Player{
   constructor(img){
@@ -199,6 +231,7 @@ class Game{
     this.cameraX = WIDTH/2
     this.cameraY = HEIGHT/2
     this.tileSize = 50
+    this.currentMenu = []
   }
   setup(){
     //this.genNewMap(10, 10);
