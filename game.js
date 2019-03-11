@@ -234,7 +234,7 @@ class Player{
 class Game{
   constructor(){
     this.player1 = new Player("p1Idle")
-    this.state = 0
+    this.state = 1
     this.map = []
     this.mapAdds = []
     this.mapCollision = []
