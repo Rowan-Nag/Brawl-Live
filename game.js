@@ -83,28 +83,22 @@ peer.on('connection', function(conn){
   console.log('connected to ', conn.id)
   if(hosting){
     console.log('hosting ', conn.id)
-
-    conn.on('data', function(data){
-      if(data[0]==1){
-        connectToId(data[1])
-      }
-      console.log('recieved ', data, ' from ', conn.id)
-    });
   }
   else if(!hosting){
     console.log('hosted by ', conn.id)
 
-    conn.on('data', function(data){
-      if(data[0]==0){
-        connPosition = data[1]
-        mid.innerHTML=connPosition.toString();
-
-      }
-    })
-  }
+    }
+  conn.on('data', function(data){
+    if(data[0]==0){
+      connPosition = data[1]
+      mid.innerHTML=connPosition.toString();
+    }
+    if(data[0]==1){
+      connectToI(data[1])
+    }
 
 })
-
+});
 function sendData(data, recievers){
   for(let i = 0; i < recievers.length; i++){
     recievers[i].send(data)
@@ -113,8 +107,9 @@ function sendData(data, recievers){
 }
 
 function connectToId(id){
-  connections.push(peer.connect(id))
-  return peer.connect(id)
+  let tempConn = peer.connect(id)
+  connections.push(tempConn)
+  return tempConn
 }
 
 
