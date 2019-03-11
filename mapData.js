@@ -71,3 +71,14 @@ var tileData = {
     name:"backRockWall"
   }
 }
+var playerData = {
+  images:{
+    1:{
+      down: "p1Down",
+      up: "p1Up",
+      left: "p1Left",
+      right: "p1Right",
+      attack: "playerOneBasicAttack"
+    }
+  }
+}

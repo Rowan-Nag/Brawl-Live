@@ -89,16 +89,52 @@ peer.on('connection', function(conn){
 
     }
   conn.on('data', function(data){
-    if(data[0]==0){
-      connPosition = data[1]
-      mid.innerHTML=connPosition.toString();
-    }
-    if(data[0]==1){
-      connectToI(data[1])
-    }
+    //console.log('recieved ', data, ' from ', conn.id)
+    switch(data[0]){
+    case 0:
 
-})
+        mid.innerHTML=data[1].toString();
+        break;
+
+    case 1:
+      mainConn=connectToId(data[1])
+      break;
+
+    case 2:
+      mainConn.send([4, game.player1.num])
+      startGame()
+      break;
+
+    case 3:
+      game.p2Keys = data[1]
+      break;
+    case 4:
+      this.player2 = new Player(data[1])
+      break;
+    case 5:
+      game.player2.x = data[1][0]
+      game.player2.y = data[1][1]
+      game.player2.image = data[1][2]
+
+
+      game.player1.x = data[2][0]
+      game.player1.y = data[2][1]
+      game.player1.image = data[2][2]
+  }
+  })
 });
+function startGame(){
+
+  if(hosting){
+    game.switchState(1)
+  }else{
+
+    game.switchState(2)
+  }
+  mainConn.send([4, game.player1.num])
+
+
+}
 function sendData(data, recievers){
   for(let i = 0; i < recievers.length; i++){
     recievers[i].send(data)
@@ -108,7 +144,6 @@ function sendData(data, recievers){
 
 function connectToId(id){
   let tempConn = peer.connect(id)
-  connections.push(tempConn)
   return tempConn
 }
 
@@ -134,22 +169,29 @@ function joinButton(){
     mid.innerHTML = "put your friends ID in the box to the left and click connect!"
 }
 function startButton(){
-  console.log(connections)
-  sendData([2], connections)
-  game.switchState(1)
-  connections[0].send(0)
-  for(let i = 0; i< connections.length; i++){
-    console.log(connections[i])
-    connections[i].send([0, i])
+  if(!game.player2){
+    mainConn.send(2)
   }
+  mainConn.send([2]);
+  startGame();
+  game.switchState(1)
+
 }
 function connectButton(){
+
   mid.innerHTML = "connected";
   mainConn = connectToId(document.getElementById('peerId').value)
+  mainConn.send(1)
   mainConn.send([1, peerId])
   console.log(mainConn,mainConn.id, peerId)
+  game.switchMenu(game.menus.ping)
   hosting = false
 }
+
+function singlePlayerButton(){
+  game.switchState(3)
+}
+
 class Tile{
   constructor(x, y, width, height, type, collision){
     this.x = x;
@@ -202,9 +244,10 @@ class menuButton{
 }
 
 class Player{
-  constructor(img, basicAttackImg){
-    this.basicAttackImg = document.getElementById(basicAttackImg)
-    this.image = document.getElementById(img)
+  constructor(num){
+    this.num = num
+    this.basicAttackImg = playerData.images[num].attack
+    this.image = playerData.images[num].down
     this.x = WIDTH/2;
     this.y = HEIGHT/2;
     this.speed = 4
@@ -213,7 +256,15 @@ class Player{
     this.height =42
     this.frameX = 0
 
+    this.downImg=playerData.images[num].down
+    this.upImg=playerData.images[num].up
+    this.leftImg=playerData.images[num].left
+    this.rightImg=playerData.images[num].right
+    console.log(this.downImg, 500)
+
+
     this.basicAttackX = 0
+
     this.basicAttackDelay = 0
     this.angle = 0
 
@@ -225,7 +276,7 @@ class Player{
 
   draw(x, y){
     ctx.imageSmoothingEnabled = false
-    ctx.drawImage(this.image,32*this.frameX, 0, 32, 42, x, y, this.width, this.height);
+    ctx.drawImage(document.getElementById(this.image),32*this.frameX, 0, 32, 42, x, y, this.width, this.height);
 
   }
   incrementFrame(numFrames) {
@@ -246,7 +297,7 @@ class Player{
 		  ctx.rotate( this.angle * Math.PI / 180)
 
 		  ctx.translate( - (((this.x + this.x + 40) / 2) + 0 ), - (((this.y + this.y + 40)/2) + 20));
-		  ctx.drawImage(this.basicAttackImg, (64*this.basicAttackX) + 16, 0, 40, 32, this.x, this.y, this.width + 16, this.height + 16)
+		  ctx.drawImage(document.getElementById(this.basicAttackImg), (64*this.basicAttackX) + 16, 0, 40, 32, this.x, this.y, this.width + 16, this.height + 16)
 
 		  ctx.setTransform(1, 0, 0, 1, 0, 0);
 
@@ -276,25 +327,28 @@ class Player{
 
   }
 
-  move(){
+  move(keyList){
     let xTemp = this.x+0, yTemp = this.y+0
-
-    if(keys.a in keysDown){
+    console.log(this.image)
+    if(keys.a in keyList){
       this.x -= this.speed
-      this.image = document.getElementById("p1Left")
+      this.image = this.leftImg
 
     }
-    if(keys.d in keysDown){
+
+    if(keys.d in keyList){
       this.x += this.speed
-      this.image = document.getElementById("p1Right")
+      this.image = this.rightImg
     }
-    if(keys.w in keysDown){
+
+    if(keys.w in keyList){
       this.y -= this.speed
-      this.image = document.getElementById("p1Up")
+      this.image = this.upImg
     }
-    if(keys.s in keysDown){
+
+    if(keys.s in keyList){
       this.y += this.speed
-      this.image = document.getElementById("p1Down")
+      this.image = this.downImg
     }
     let dy = this.y-yTemp
     let dx = this.x-xTemp
@@ -349,8 +403,9 @@ class Player{
 
 class Game{
   constructor(){
-    this.player1 = new Player("p1Idle","playerOneBasicAttack")
-    this.hostedPlayers = [];
+    this.player1 = new Player(1)
+    this.player2 = new Player(1);
+    this.p2Keys = {};
     this.state = 0;
     this.map = [];
     this.mapAdds = [];
@@ -375,10 +430,12 @@ class Game{
   genMenus(){
     //x, y, width, height, text, func, font, size
     this.menus ={
-      main:[new menuButton(WIDTH/2-100, HEIGHT*1/2, 200, 50, 'Host Game', function(){hostButton()}, 'arial', 15),
+      main:[new menuButton(WIDTH/2-100, HEIGHT*1/2-50, 200, 50, 'Solo Game', function(){singlePlayerButton()}, 'arial', 15),
+            new menuButton(WIDTH/2-100, HEIGHT*1/2, 200, 50, 'Host Game', function(){hostButton()}, 'arial', 15),
             new menuButton(WIDTH/2-100, HEIGHT*1/2+50, 200, 50, 'Join Game', function(){joinButton()}, 'arial', 15)],
-      host:[new menuButton(WIDTH/2-100, HEIGHT*1/2-50, 200, 50, 'Start Game', function(){startButton()}, 'arial', 15)],
-      join:[new menuButton(WIDTH/2-100, HEIGHT*1/2-50, 200, 50, 'Connect', function(){connectButton()}, 'arial', 15)],
+      host:[new menuButton(WIDTH/2-100, HEIGHT*1/2-100, 200, 50, 'Start Game', function(){startButton()}, 'arial', 15)],
+      join:[new menuButton(WIDTH/2-100, HEIGHT*1/2-150, 200, 50, 'Connect', function(){connectButton()}, 'arial', 15)],
+      ping:[new menuButton(WIDTH/2-100, HEIGHT*1/2-150, 200, 50, 'Ping', function(){mainConn.send([1,peerId])}, 'arial', 15)]
     }
   }
   drawMap(map){
@@ -540,6 +597,9 @@ class Game{
       this.sprites[i].draw();
     }
     this.player1.draw(this.player1.x-this.cameraX+WIDTH/2, this.player1.y-this.cameraY+HEIGHT/2)
+    if(this.player2){
+    this.player2.draw(this.player2.x-this.cameraX+WIDTH/2, this.player2.y-this.cameraY+HEIGHT/2)
+  }
   }
 
   switchMenu(target){
@@ -578,6 +638,10 @@ class Game{
   this.state = target/1;
 }
 
+  renderOther(player){
+
+  }
+
   stateEngine(){
 
     switch(this.state){
@@ -585,17 +649,27 @@ class Game{
         ctx.fillRect(0,0,WIDTH,HEIGHT)
         this.drawMenu(this.currentMenu);
         break;
-      case 1:
+      case 1: //hosting
         this.player1.mouseAngle();
-        this.player1.move();
+        this.player1.move(keysDown);
+        this.player2.move(this.p2Keys)
         this.drawMap(this.map);
         this.drawMap(this.mapAdds);
         this.drawMap(this.mapCollision)
         this.drawSprites();
         this.player1.basicAttack();
+        mainConn.send([5, [this.player1.x,this.player1.y, this.player1.image],[this.player2.x,this.player2.y,this.player2.image]])
         break;
-      case 2: //hosting
-        sendData(this.hostedPlayers)
+      case 2://joining
+        mainConn.send([3, keysDown])
+      case 3: //singlePlayer
+        this.player1.mouseAngle();
+        this.player1.move(keysDown);
+        this.drawMap(this.map);
+        this.drawMap(this.mapAdds);
+        this.drawMap(this.mapCollision)
+        this.drawSprites();
+        this.player1.basicAttack();
     }
   }
 
