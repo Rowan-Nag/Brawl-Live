@@ -1,27 +1,9 @@
 var canvas = document.getElementById('base');
-var context = canvas.getContext("2d");
 ctx = canvas.getContext('2d');
 WIDTH = canvas.width;
 HEIGHT = canvas.height;
 ctx.fillRect(0,0,WIDTH,HEIGHT)
 var ticks = 0
-var mouseX = 0
-var mouseY = 0
-
-window.addEventListener('mousemove', initiatePos, false);
-
-function initiatePos(e) {
-    var pos = getMousePos(canvas, e);
-}
-
-function getMousePos(canvas, evt){
-	var rect = canvas.getBoundingClientRect();
-    
-        mouseX = ((evt.clientX - rect.left) / (rect.right - rect.left) * canvas.width)
-        mouseY = ((evt.clientY - rect.top) / (rect.bottom - rect.top) * canvas.height)
-	
-		
-  }
 
 var keys = {down: 40,
             up: 38,
@@ -39,6 +21,22 @@ var keys = {down: 40,
     frameRate = 1/60,
     frameDelay = frameRate*1000,
     totalMenuButtons = 0
+
+
+window.addEventListener('mousemove', initiatePos, false);
+
+function initiatePos(e) {
+      var pos = getMousePos(canvas, e);
+  }
+
+function getMousePos(canvas, evt){
+  	var rect = canvas.getBoundingClientRect();
+
+    mouseX = ((evt.clientX - rect.left) / (rect.right - rect.left) * canvas.width)
+    mouseY = ((evt.clientY - rect.top) / (rect.bottom - rect.top) * canvas.height)
+
+
+}
 
 
 addEventListener("keydown", function (e) {
@@ -69,21 +67,46 @@ var requestInterval = function (fn, delay) {
   return handle;
 };
 
+var mid = document.getElementById('middleP')
+
 var peer = new Peer;
-var peerId, conn, connections = [];
+var peerId, mainConn, connections = [], hosting, connPosition = -2;
+
+
 peer.on('open', function(id) {
   console.log('My peer ID is: ' + id);
   peerId = id
 });
+
+
 peer.on('connection', function(conn){
-  console.log('hosting ', conn.id)
-  connections.push(conn)
-  conn.on('data', function(data) {
-    console.log('recieved ', data, ' from ', conn.id)
-  });
+  if(hosting){
+    console.log('hosting ', conn.id)
+    connections.push(conn)
+    conn.send([0, connections.length-1])
+    conn.on('data', function(data){
+      console.log('recieved ', data, ' from ', conn.id)
+    });
+  }
+  else if(connPosition <0){
+    conn.on('data', function(data){
+      if(data[0]==0){
+        connPosition = data[1]
+        console.log("position: " + connPosition.toString());
+      }
+    })
+  }
+
 })
 
+function sendData(data, recievers){
+  for(let i = 0; i < recievers.length; i++){
+    recievers[i].send(data)
+  }
+}
+
 function connectToId(id){
+  connections.push(peer.connect(id))
   return peer.connect(id)
 }
 
@@ -95,25 +118,26 @@ function collision(a, b){
    a.y + a.height > b.y)
 }
 
-function hostGame(){
-  console.log('hosting')
-}
-
-function joinGame(){
-  console.log('joining')
-}
-
 
 //Button functions
 function hostButton(){
-    var mid = document.getElementById('middleP')
+    hosting = true
     console.log('HOSTING')
     mid.innerHTML = "Your ID: " + peerId.toString();
     game.switchMenu(game.menus.host)
 }
+function joinButton(){
+    game.switchMenu(game.menus.join)
+    mid.innerHTML = "put your friends ID in the box to the left and click connect!"
+}
 function startButton(){
   console.log('starting')
   game.switchState(1)
+}
+function connectButton(){
+  mid.innerHTML = "connected";
+  mainConn = connectToId(document.getElementById('peerId').value)
+  hosting = false
 }
 class Tile{
   constructor(x, y, width, height, type, collision){
@@ -177,12 +201,12 @@ class Player{
     this.width = 32
     this.height =42
     this.frameX = 0
-	  
+
     this.basicAttackX = 0
     this.basicAttackDelay = 0
     this.angle = 0
-	
-    this.delay = 0  
+
+    this.delay = 0
     this.effects = {
       walking:true,
     }
@@ -199,46 +223,46 @@ class Player{
       this.frameX -= numFrames
     }
   }
-  
-  basicAttack(){
-	  
 
-	  
+  basicAttack(){
+
+
+
 	  if(keys.q in keysDown){
 		  console.log(this.x)
 		  ctx.translate(this.x + 16, this.y + 24);
-		  
+
 		  ctx.rotate( this.angle * Math.PI / 180)
 
 		  ctx.translate( - (((this.x + this.x + 40) / 2) + 0 ), - (((this.y + this.y + 40)/2) + 20));
 		  ctx.drawImage(this.basicAttackImg, (64*this.basicAttackX) + 16, 0, 40, 32, this.x, this.y, this.width + 16, this.height + 16)
-		  
+
 		  ctx.setTransform(1, 0, 0, 1, 0, 0);
-		  
+
 	  if (this.basicAttackDelay < 1) {
 		  this.basicAttackDelay += 1;
 		} else {
 		  if (this.basicAttackX < 7 ) {
 			this.basicAttackX += 1;
 		  } else {
-			this.basicAttackX = 0; 
+			this.basicAttackX = 0;
 		  }
 			this.basicAttackDelay = 0
 		}
-		  
 
-	  
+
+
   }
 }
-	
+
   mouseAngle(){
-	  
+
 	 this.angle = (-((Math.atan2(this.x - mouseX, this.y - mouseY)*180) / 2))/1.5
-	  
-	  
-	  
-	  
-	
+
+
+
+
+
   }
 
   move(){
@@ -309,12 +333,12 @@ class Player{
       game.cameraY = this.y
     }
   }
-	
+
 }
 
 class Game{
   constructor(){
-    this.player1 = new Player("p1Idle", "playerOneBasicAttack")
+    this.player1 = new Player("p1Idle","playerOneBasicAttack")
     this.state = 0
     this.map = []
     this.mapAdds = []
@@ -341,8 +365,8 @@ class Game{
     this.menus ={
       main:[new menuButton(WIDTH/2-100, HEIGHT*1/2, 200, 50, 'Host Game', function(){hostButton()}, 'arial', 15),
             new menuButton(WIDTH/2-100, HEIGHT*1/2+50, 200, 50, 'Join Game', function(){joinButton()}, 'arial', 15)],
-      host:[new menuButton(WIDTH/2-100, HEIGHT*1/2-50, 200, 50, 'Start Game', function(){startButton()}, 'arial', 15)]
-
+      host:[new menuButton(WIDTH/2-100, HEIGHT*1/2-50, 200, 50, 'Start Game', function(){startButton()}, 'arial', 15)],
+      join:[new menuButton(WIDTH/2-100, HEIGHT*1/2-50, 200, 50, 'Connect', function(){connectButton()}, 'arial', 15)],
     }
   }
   drawMap(map){
@@ -550,13 +574,13 @@ class Game{
         this.drawMenu(this.currentMenu);
         break;
       case 1:
-	this.player1.mouseAngle()
-        this.player1.move()
+        this.player1.mouseAngle();
+        this.player1.move();
         this.drawMap(this.map);
         this.drawMap(this.mapAdds);
         this.drawMap(this.mapCollision)
         this.drawSprites();
-        this.player1.basicAttack()
+        this.player1.basicAttack();
         break;
     }
   }
@@ -569,6 +593,8 @@ function update(){
   ctx.clearRect(0, 0, WIDTH, HEIGHT)
   game.stateEngine()
 }
+
+
 function updateTicks(){
   ticks += 1
   if(game.player1.effects.walking && ticks%2 ==0){
