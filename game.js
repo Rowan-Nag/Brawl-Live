@@ -65,7 +65,6 @@ peer.on('connection', function(conn){
   });
 })
 
-
 function connectToId(id){
   return peer.connect(id)
 }
@@ -76,6 +75,14 @@ function collision(a, b){
    a.x + a.width > b.x &&
    a.y < b.y + b.height &&
    a.y + a.height > b.y)
+}
+
+function hostGame(){
+  console.log('hosting')
+}
+
+function joinGame(){
+  console.log('joining')
 }
 class Tile{
   constructor(x, y, width, height, type, collision){
@@ -91,7 +98,7 @@ class Tile{
 
 
 class menuButton{
-  constructor(x, y, text, width, height, func, font, size){
+  constructor(x, y, width, height, text, func, font, size){
     this.x = x;
     this.y = y;
     this.text = document.createTextNode(text);
@@ -100,14 +107,18 @@ class menuButton{
     this.func = func;
     this.button = document.createElement('button');
     this.button.appendChild(this.text);
-    this.button.style.x = this.x;
-    this.button.style.y = this.y;
+    this.button.style.left = x.toString()+"px";
+    this.button.style.bottom = HEIGHT-y.toString()+"px";
     this.button.style.width = this.width;
     this.button.style.height = this.height;
     this.button.classList.add('menuButton')
-    this.image = ctx.getElementById('button')
-    totalMenuButtons++
+    this.image = document.getElementById('Nbutton')
 
+    this.button.onclick=func
+    console.log(this.button)
+    totalMenuButtons++
+    this.deactivate();
+    document.getElementById('canvasDiv').appendChild(this.button)
   }
   draw(){
     ctx.drawImage(this.image, this.x, this.y, this.width, this.height)
@@ -223,7 +234,7 @@ class Player{
 class Game{
   constructor(){
     this.player1 = new Player("p1Idle")
-    this.state = 1
+    this.state = 0
     this.map = []
     this.mapAdds = []
     this.mapCollision = []
@@ -231,6 +242,7 @@ class Game{
     this.cameraX = WIDTH/2
     this.cameraY = HEIGHT/2
     this.tileSize = 50
+    this.menus = {}
     this.currentMenu = []
   }
   setup(){
@@ -238,8 +250,19 @@ class Game{
 	  this.map = this.listToMap(MAPS[1].tiles)
     this.mapAdds = this.listToMap(MAPS[1].adds)
     this.mapCollision = this.renderCollision(MAPS[1].collision)
+    this.genMenus();
+    this.currentMenu = this.menus.main
 
+    this.switchMenu(this.currentMenu);
 
+  }
+  genMenus(){
+    //x, y, width, height, text, func, font, size
+    this.menus ={
+      main:[new menuButton(WIDTH/2-100, HEIGHT*2/3, 200, 50, 'Host Game', function(){hostGame()}, 'arial', 15),
+            new menuButton(WIDTH/2-100, HEIGHT*2/3-100, 200, 50, 'Join Game', function(){joinGame()}, 'arial', 15)],
+
+    }
   }
   drawMap(map){
     ctx.imageSmoothingEnabled = false
@@ -254,6 +277,7 @@ class Game{
       }
     }
   }
+
   renderCollision(tiles){
 
     let collideable = false,b = []
@@ -286,6 +310,7 @@ class Game{
     return b
 
   }
+
   genNewMap(w, h){
     let a = [];
 
@@ -305,8 +330,6 @@ class Game{
 
     this.map = a
   }
-
-
 
   listToMap(tiles){
     console.log(tiles)
@@ -394,7 +417,6 @@ class Game{
   return target
   }
 
-
   drawSprites(){
 
     for(let i = 0; i < this.sprites.length; i++){
@@ -403,10 +425,28 @@ class Game{
     this.player1.draw(this.player1.x-this.cameraX+WIDTH/2, this.player1.y-this.cameraY+HEIGHT/2)
   }
 
+  switchMenu(target){
+    for(let i = 0; i < this.currentMenu.length; i++){
+      this.currentMenu[i].deactivate();
+    }
+    for(let i = 0; i < target.length; i++){
+      target[i].activate();
+    }
+  }
+
+  drawMenu(menu){
+    for(let i = 0;i< menu.length; i++){
+
+      menu[i].draw()
+
+    }
+
+  }
+
   stateEngine(){
     switch(this.state){
       case 0:
-
+        this.drawMenu(this.currentMenu);
         break;
       case 1:
         this.player1.move()
@@ -426,7 +466,6 @@ function update(){
   game.stateEngine()
 }
 function updateTicks(){
-
   ticks += 1
   if(game.player1.effects.walking && ticks%2 ==0){
     game.player1.incrementFrame(2)

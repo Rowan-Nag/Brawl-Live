@@ -1,5 +1,11 @@
 @charset "UTF-8";
-canvas {
+.menuButton {
+  color:black;
+  background: transparent;
+  border: none !important;
+  position: relative;
+}
+#canvasDiv {
   width: 512px;
   height: 512px;
   display: block;
@@ -9,9 +15,4 @@ canvas {
   image-rendering: pixelated;
   image-rendering: crisp-edges;
 
-};
-.menuButton{
-  background: transparent;
-  border: none !important;
-  position: absolute;
 }
