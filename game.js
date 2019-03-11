@@ -550,12 +550,13 @@ class Game{
         this.drawMenu(this.currentMenu);
         break;
       case 1:
-
+	this.player1.mouseAngle()
         this.player1.move()
         this.drawMap(this.map);
         this.drawMap(this.mapAdds);
         this.drawMap(this.mapCollision)
         this.drawSprites();
+        this.player1.basicAttack()
         break;
     }
   }
