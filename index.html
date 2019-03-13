@@ -11,29 +11,21 @@
 			</h1>
 		</header>
 	</article>
-</div>
+<div/>
 
 
 
-<div id="canvasDiv">
+
 <canvas id = "base" width="500" height="500" style="border-style: solid; border-width: 2px">
-
-	<img id="Nbutton" src="Assets/BaseButton.png">
-	<img id="NbuttonGlow" src="Assets/BaseButtonReversed.png">
-
-	<img id ="playerOneBasicAttack" src="Assets/PlayerOneBasicAttack.png">
-
+  
+  <img id ="playerOneBasicAttack" src="Assets/PlayerOneBasicAttack.png">
   <img id ="p1Left" src="Assets/Sprite-Fighter-1-Left.png">
   <img id ="p1Right" src="Assets/Sprite-Fighter-1-Right.png">
   <img id ="p1Up" src="Assets/Sprite-Fighter-1-Up.png">
   <img id ="p1Down" src="Assets/Sprite-Fighter-1-Down.png">
   <img id ="p1Idle" src="Assets/Sprite-Fighter-1-Down.png">
-
-	<img id ="p2Left" src="Assets/Sprite-Fighter-2-Left.png">
-  <img id ="p2Right" src="Assets/Sprite-Fighter-2-Right.png">
-  <img id ="p2Up" src="Assets/Sprite-Fighter-2-Up.png">
-  <img id ="p2Down" src="Assets/Sprite-Fighter-2-Down.png">
-  <img id ="p2Idle" src="Assets/Sprite-Fighter-2-Down.png">
+  
+  
 
   <img id="floor" src="Assets/DirtyGround.png">
 
@@ -62,15 +54,14 @@
 
 
 </canvas>
-</div>
-<p align="center" id ="middleP"> &nbsp
-<p> <input id="peerId" type="text"> </input><p>
+<p> <input id="peerId" type="text"> </input><button onClick="conn = connectToId(document.getElementById('peerId').value)"> Connect </button> <p>
+	<button onClick="conn.send(':hypers:')"> HYPERS </button>
+<button width="200px" height="40px" onClick="game.genNewMap(200, 200)"> Big Map</button>
 </html>
 
 <link href="new.css" rel="stylesheet" type="text/css">
 <!--PEER.JS right here -->
 <script src="https://cdn.jsdelivr.net/npm/peerjs@0.3.20/dist/peer.min.js"></script>
-
 <script src="mapData.js"></script>
 
 <script src="game.js"></script>
