@@ -94,7 +94,7 @@ var playerData = {
 }
 
 var attackData = {
-  //10 ticks = 1 second
+  //20 ticks = 1 second
   //speed: movement (without rotations), moveLock: ticks that you can't do anything,
   //effects:{effectName:[efectLevel, startFrame, endFrame]}, they can only be applied once
   //effects inGame rn: damage

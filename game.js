@@ -324,7 +324,8 @@ class Attack{
     ctx.rotate(this.rotation)
     ctx.translate(-x,-y)
     ctx.drawImage(document.getElementById(this.image), this.frameX*this.currentFrame, 0, this.frameX, this.frameY, x-this.frameX,y-this.frameY, this.frameX*this.size, this.frameY*this.size)
-
+    ctx.strokeRect(x-this.frameX,y-this.frameY,this.frameX,this.frameY)
+    ctx.stroke();
     ctx.restore();
   }
   incrementFrame(){
@@ -437,7 +438,7 @@ class Player{
     let xTemp = this.x+0, yTemp = this.y+0
 
     if(keys.q in keyList){
-      this.attacks.push(new Attack(this.x+this.width/2, this.y+this.height/2, -this.angle, this.attackImg,1, 5, "melee1"))
+      this.attacks.push(new Attack(this.x+this.width/2, this.y+this.height/2, -this.angle, this.attackImg,1, 1, "melee1"))
       this.effects["moveLock"] = this.attacks[this.attacks.length-1].moveLock;
       game.attacks.push(this.attacks[this.attacks.length-1])
     }
@@ -722,7 +723,10 @@ class Game{
   drawSprites(){
     for(let i = 0; i < this.attacks.length; i++){
       this.attacks[i].draw(this.attacks[i].x-this.cameraX+WIDTH/2,this.attacks[i].y-this.cameraY+HEIGHT/2);
-
+      if(this.attacks[i].currentFrame==this.attacks[i].totalFrames){
+        this.attacks.splice(i, 1)
+        i -= 1
+      }
     }
     for(let i = 0; i < this.sprites.length; i++){
       this.sprites[i].draw();
@@ -820,7 +824,7 @@ function updateTicks(){
 
   ticks += 1
   game.player1.reduceCooldowns();
-  if(game.player1.effects.walking && ticks%2 ==0){
+  if(game.player1.effects.walking && ticks%4 ==0){
     game.player1.incrementFrame(2)
   }
   for(let i = 0; i < game.attacks.length; i++){
@@ -832,5 +836,5 @@ function updateTicks(){
   }
 }
 
-var tickCount = setInterval(updateTicks, 100)
+var tickCount = setInterval(updateTicks, 50)
 requestInterval(update, frameDelay)
