@@ -49,6 +49,7 @@ var MAPS = {
 
   }
 }
+
 var tileData = {
   0:{
     imgId:"floor",
@@ -69,9 +70,11 @@ var tileData = {
     imgId:"backRockWall",
     collision:0,
     name:"backRockWall"
-  }
+  },
 }
+
 var playerData = {
+   //just images for now
   images:{
     1:{
       down: "p1Down",
@@ -87,5 +90,37 @@ var playerData = {
       right: "p2Right",
       attack: "playerOneBasicAttack"
     }
+  }
+}
+
+var attackData = {
+  //10 ticks = 1 second
+  //speed: movement (without rotations), moveLock: ticks that you can't do anything,
+  //effects:{effectName:[efectLevel, startFrame, endFrame]}, they can only be applied once
+  //effects inGame rn: damage
+  "melee1":{
+    speed:0,
+    moveLock:10,
+    effects:{damage:[1,0,10]},
+    properties:[]
+  },
+  "projectile1":{
+    speed:8,
+    moveLock:5,
+    effects:{damage:[1,0,-1]},
+    properties:[]
+  }
+}
+
+var sprites = {
+  "PlayerOneBasicAttack":{
+    xs:64,
+    ys:64,
+    frames:7
+  },
+  "PlayerTwoBasicAttack":{
+    xs:64,
+    ys:64,
+    frames:8
   }
 }

@@ -288,7 +288,36 @@ class menuButton{
   }
 
 }
+class Attack{
+  constructor(x, y, rotation, image, size, frames, type){
+    this.x = x;//X/Y starting pos
+    this.y = y;
+    this.size = size; //size scale
+    this.rotation = rotation; //rotation in radians
+    this.frames = frames; //frames the attack lasts
+    this.type = type //type (check attackData in mapData.js)
+    this.speed = attackData.type.speed; //speed
+    this.moveLock = attackData.type.moveLock //frames you can't move
+    this.effects = attackData.type.effects; //effects
+    this.properties = attackData.type.properties //other properties
+    this.currentFrame = 0; //current frame of animation
+    this.totalFrames = sprites[image].frames; //total frames of the animation
+    this.framesX
+  }
+  move(){
+    this.x += this.speed*Math.cos(this.rotation);
+    this.y += this.speed*Math.sin(this.rotation);
+  }
+  draw(){
+    ctx.save();
+    ctx.translate(this.x, this.y)
+    ctx.rotate(this.rotation)
+    ctx.translate(-this.x,-this.y)
+    ctx.drawImage(this.image, this.x, this.y)
 
+    ctx.restore();
+  }
+}
 class Player{
   constructor(num, basicAttackImage){
     this.num = num
@@ -340,7 +369,7 @@ class Player{
 		  console.log(this.x)
 		  ctx.translate(this.x + 16, this.y + 24);
 
-		  ctx.rotate( this.angle * Math.PI / 180)
+		  ctx.rotate(-this.angle)
 
 		  ctx.translate( - (((this.x + this.x + 40) / 2) + 0 ), - (((this.y + this.y + 40)/2) + 20));
 		  ctx.drawImage(document.getElementById(this.basicAttackImg), (64*this.basicAttackX) + 16, 20, 64, 64, this.x, this.y, this.width + 32, this.height + 32)
@@ -365,14 +394,14 @@ class Player{
 
   mouseAngle(){
 
-	 this.angle = (-((Math.atan2(this.x - mouseX, this.y - mouseY)*180) / 2))/1.5
+	 this.angle = Math.atan2(this.x - mouseX, this.y - mouseY)
 
 
   }
 
   move(keyList){
     let xTemp = this.x+0, yTemp = this.y+0
-    console.log(this.image)
+
     if(keys.a in keyList){
       this.x -= this.speed
       this.image = this.leftImg
