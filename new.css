@@ -1,5 +1,15 @@
 @charset "UTF-8";
-canvas {  
+@font-face { font-family: upheavtt; src: url('upheavtt.ttf'); } 
+
+.menuButton {
+  color:black;
+  background: transparent;
+  border: none !important;
+  position:relative;
+  text-align:middle;
+  padding-bottom: 10px;
+}
+#canvasDiv {
   width: 512px;
   height: 512px;
   display: block;
@@ -8,5 +18,23 @@ canvas {
   image-rendering: -webkit-crisp-edges;
   image-rendering: pixelated;
   image-rendering: crisp-edges;
-  
+
 }
+
+.inputBox{
+ 
+  text-align: center;
+}
+
+#sticky {
+  width:100%;
+  height:44px;
+  padding-top:10px;
+  background:black;
+  color:white;
+  font-weight:bold;
+  font-size:12px;
+  text-align:center;
+  position:sticky;    
+  bottom:0;          
+  left:0;           

@@ -1,5 +1,10 @@
 <!DOCTYPE html>
 <html>
+<style>
+	body{
+		background-color: rgba(0,0,0,1.00)
+	}
+	</style>
 <head>
 	<title>Brawl Live</title>
 	<link rel="shortcut icon" type="image/png" href="Assets/DirtyGround.png">
@@ -7,25 +12,34 @@
 <div>
 	<article>
 		<header>
-			<h1 align="center"><font face="Verdana" size = "10px" color="black">Brawl Live</font>
+			<h1 align="center"><font face="upheavtt" size = "25px" color="white">Brawl Live</font>
 			</h1>
 		</header>
 	</article>
-<div/>
+</div>
 
 
 
-
+<div id="canvasDiv">
 <canvas id = "base" width="500" height="500" style="border-style: solid; border-width: 2px">
-  
-  <img id ="playerOneBasicAttack" src="Assets/PlayerOneBasicAttack.png">
+
+	<img id="Nbutton" src="Assets/BaseButton.png">
+	<img id="NbuttonGlow" src="Assets/BaseButtonReversed.png">
+
+	<img id ="playerOneBasicAttack" src="Assets/PlayerOneBasicAttack.png">
+	<img id ="playerTwoBasicAttack" src="Assets/PlayertwoBasicAttack.png">
+
   <img id ="p1Left" src="Assets/Sprite-Fighter-1-Left.png">
   <img id ="p1Right" src="Assets/Sprite-Fighter-1-Right.png">
   <img id ="p1Up" src="Assets/Sprite-Fighter-1-Up.png">
   <img id ="p1Down" src="Assets/Sprite-Fighter-1-Down.png">
   <img id ="p1Idle" src="Assets/Sprite-Fighter-1-Down.png">
-  
-  
+
+	<img id ="p2Left" src="Assets/Sprite-Fighter-2-Left.png">
+  <img id ="p2Right" src="Assets/Sprite-Fighter-2-Right.png">
+  <img id ="p2Up" src="Assets/Sprite-Fighter-2-Up.png">
+  <img id ="p2Down" src="Assets/Sprite-Fighter-2-Down.png">
+  <img id ="p2Idle" src="Assets/Sprite-Fighter-2-Down.png">
 
   <img id="floor" src="Assets/DirtyGround.png">
 
@@ -54,20 +68,27 @@
 
 
 </canvas>
-<p> <input id="peerId" type="text"> </input><button onClick="conn = connectToId(document.getElementById('peerId').value)"> Connect </button> <p>
-	<button onClick="conn.send(':hypers:')"> HYPERS </button>
-<button width="200px" height="40px" onClick="game.genNewMap(200, 200)"> Big Map</button>
+</div>
+	
+<div id = "visibility" style="visibility: hidden";>hello</div>
+	
+<p align="center" id ="middleP" style="color: white"> &nbsp
+	<div class="inputBox">
+		<p> <input id="peerId" type="text" placeholder="Put your Friends ID here!" align="middle" style="visibility: hidden"> </input><p>
+	</div>
+
+<footer id="sticky">Created by: @Proto Chicken & @Atherna</footer>
+
 </html>
 
 <link href="new.css" rel="stylesheet" type="text/css">
 <!--PEER.JS right here -->
 <script src="https://cdn.jsdelivr.net/npm/peerjs@0.3.20/dist/peer.min.js"></script>
+
 <script src="mapData.js"></script>
 
 <script src="game.js"></script>
 
 
 
-<footer>
-	<p align="center">Created by: @Protochicken and @atherna</p>
-</footer>
+
