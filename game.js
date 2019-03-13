@@ -239,7 +239,6 @@ function howToPlay(){
 	game.switchMenu(game.menus.howToPlay)
 }
 
-
 class Tile{
   constructor(x, y, width, height, type, collision){
     this.x = x;
@@ -288,6 +287,7 @@ class menuButton{
   }
 
 }
+
 class Attack{
   constructor(x, y, rotation, image, size, frames, type){
     this.x = x;//X/Y starting pos
@@ -296,28 +296,50 @@ class Attack{
     this.rotation = rotation; //rotation in radians
     this.frames = frames; //frames the attack lasts
     this.type = type //type (check attackData in mapData.js)
-    this.speed = attackData.type.speed; //speed
-    this.moveLock = attackData.type.moveLock //frames you can't move
-    this.effects = attackData.type.effects; //effects
-    this.properties = attackData.type.properties //other properties
+    this.speed = attackData[type].speed; //speed
+    this.moveLock = attackData[type].moveLock //frames you can't move
+    this.effects = attackData[type].effects; //effects
+    this.properties = attackData[type].properties //other properties
     this.currentFrame = 0; //current frame of animation
+    this.image = image
     this.totalFrames = sprites[image].frames; //total frames of the animation
-    this.framesX
+    this.frameX = sprites[image].xs;
+    this.frameY = sprites[image].ys;
+    this.loop = false //sprites[image].loop;
+    this.ticksPerFrame = this.frames/this.totalFrames;
+
+
   }
   move(){
-    this.x += this.speed*Math.cos(this.rotation);
-    this.y += this.speed*Math.sin(this.rotation);
+    if(this.speed > 0){
+      this.x += this.speed*Math.cos(this.rotation);
+      this.y += this.speed*Math.sin(this.rotation);
+    }
   }
-  draw(){
+  draw(x, y){
+
     ctx.save();
-    ctx.translate(this.x, this.y)
+
+    ctx.translate(x, y)
     ctx.rotate(this.rotation)
-    ctx.translate(-this.x,-this.y)
-    ctx.drawImage(this.image, this.x, this.y)
+    ctx.translate(-x,-y)
+    ctx.drawImage(document.getElementById(this.image), this.frameX*this.currentFrame, 0, this.frameX, this.frameY, x-this.frameX,y-this.frameY, this.frameX*this.size, this.frameY*this.size)
 
     ctx.restore();
   }
+  incrementFrame(){
+    this.currentFrame += 1;
+    if(this.currentFrame > this.totalFrames){
+      if(this.loop){
+        this.currentFrame = 0;
+      }else{
+        this.currentFrame -=1
+      }
+    }
+  }
+
 }
+
 class Player{
   constructor(num, basicAttackImage){
     this.num = num
@@ -325,16 +347,18 @@ class Player{
     this.image = playerData.images[num].down
     this.x = WIDTH/2;
     this.y = HEIGHT/2;
-    this.speed = 4
-    this.facing = 0
-    this.width = 32
-    this.height = 42
-    this.frameX = 0
+    this.speed = 4;
+    this.facing = 0;
+    this.width = 32;
+    this.height = 42;
+    this.frameX = 0;
+    this.attacks = [];
 
     this.downImg=playerData.images[num].down
     this.upImg=playerData.images[num].up
     this.leftImg=playerData.images[num].left
     this.rightImg=playerData.images[num].right
+    this.attackImg= playerData.images[num].attack
     console.log(this.downImg, 500)
 
 
@@ -344,9 +368,13 @@ class Player{
     this.angle = 0
 
     this.delay = 0
+
     this.effects = {
       walking:true,
+      "moveLock":0,
     }
+
+    this.cooldowns = ["moveLock"]
   }
 
   draw(x, y){
@@ -392,15 +420,28 @@ class Player{
   }
 }
 
+  reduceCooldowns(){
+    for(let i = 0; i < this.cooldowns.length; i++){
+
+      this.effects[this.cooldowns[i]] -= 1;
+    }
+  }
   mouseAngle(){
 
-	 this.angle = Math.atan2(this.x - mouseX, this.y - mouseY)
+	 this.angle = Math.atan2(this.x+this.width/2 - mouseX, this.y+this.height/2 - mouseY)
 
 
   }
 
   move(keyList){
     let xTemp = this.x+0, yTemp = this.y+0
+
+    if(keys.q in keyList){
+      this.attacks.push(new Attack(this.x+this.width/2, this.y+this.height/2, -this.angle, this.attackImg,1, 5, "melee1"))
+      this.effects["moveLock"] = this.attacks[this.attacks.length-1].moveLock;
+      game.attacks.push(this.attacks[this.attacks.length-1])
+    }
+
 
     if(keys.a in keyList){
       this.x -= this.speed
@@ -479,6 +520,7 @@ class Game{
     this.player2 = new Player(1);
     this.p2Keys = {};
     this.state = 0;
+    this.attacks = [];
     this.map = [];
     this.mapAdds = [];
     this.mapCollision = [];
@@ -678,7 +720,10 @@ class Game{
   }
 
   drawSprites(){
+    for(let i = 0; i < this.attacks.length; i++){
+      this.attacks[i].draw(this.attacks[i].x-this.cameraX+WIDTH/2,this.attacks[i].y-this.cameraY+HEIGHT/2);
 
+    }
     for(let i = 0; i < this.sprites.length; i++){
       this.sprites[i].draw();
     }
@@ -724,9 +769,6 @@ class Game{
   this.state = target/1;
 }
 
-  renderOther(player){
-
-  }
 
   stateEngine(){
 
@@ -743,19 +785,22 @@ class Game{
         this.drawMap(this.mapAdds);
         this.drawMap(this.mapCollision)
         this.drawSprites();
-        this.player1.basicAttack();
+        //this.player1.basicAttack();
         mainConn.send([5, [this.player1.x,this.player1.y, this.player1.image],[this.player2.x,this.player2.y,this.player2.image]])
+
         break;
       case 2://joining
         mainConn.send([3, keysDown])
       case 3: //singlePlayer
         this.player1.mouseAngle();
-        this.player1.move(keysDown);
+        if(this.player1.effects.moveLock<=0){
+          this.player1.move(keysDown);
+        }
         this.drawMap(this.map);
         this.drawMap(this.mapAdds);
         this.drawMap(this.mapCollision)
         this.drawSprites();
-        this.player1.basicAttack();
+        //this.player1.basicAttack();
     }
   }
 
@@ -772,9 +817,18 @@ function update(){
 }
 
 function updateTicks(){
+
   ticks += 1
+  game.player1.reduceCooldowns();
   if(game.player1.effects.walking && ticks%2 ==0){
     game.player1.incrementFrame(2)
+  }
+  for(let i = 0; i < game.attacks.length; i++){
+    if(ticks%game.attacks[i].ticksPerFrame<1){
+      game.attacks[i].incrementFrame()
+    }else{
+
+    }
   }
 }
 

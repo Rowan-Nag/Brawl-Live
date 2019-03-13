@@ -88,7 +88,7 @@ var playerData = {
       up: "p2Up",
       left: "p2Left",
       right: "p2Right",
-      attack: "playerOneBasicAttack"
+      attack: "playerTwoBasicAttack"
     }
   }
 }
@@ -101,24 +101,24 @@ var attackData = {
   "melee1":{
     speed:0,
     moveLock:10,
-    effects:{damage:[1,0,10]},
+    effects:{"damage":[1,0,10]},
     properties:[]
   },
   "projectile1":{
     speed:8,
     moveLock:5,
-    effects:{damage:[1,0,-1]},
+    effects:{"damage":[1,0,-1]},
     properties:[]
   }
 }
 
 var sprites = {
-  "PlayerOneBasicAttack":{
+  "playerOneBasicAttack":{
     xs:64,
     ys:64,
     frames:7
   },
-  "PlayerTwoBasicAttack":{
+  "playerTwoBasicAttack":{
     xs:64,
     ys:64,
     frames:8
