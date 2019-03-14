@@ -20,7 +20,8 @@ var keys = {down: 40,
     keysDown = {},
     frameRate = 1/60,
     frameDelay = frameRate*1000,
-    totalMenuButtons = 0
+    totalMenuButtons = 0,
+    mouseDown = false
 
 
 window.addEventListener('mousemove', initiatePos, false);
@@ -305,7 +306,7 @@ class Attack{
     this.totalFrames = sprites[image].frames; //total frames of the animation
     this.frameX = sprites[image].xs;
     this.frameY = sprites[image].ys;
-    this.loop = false //sprites[image].loop;
+    this.loop = //sprites[image].loop;
     this.ticksPerFrame = this.frames/this.totalFrames;
 
 
@@ -438,7 +439,7 @@ class Player{
   move(keyList){
     let xTemp = this.x+0, yTemp = this.y+0
 
-    if(keys.q in keyList){
+    if(mouseDown){
       this.activeAttacks.push(new Attack(this.x+this.width/2, this.y+this.height/2, -this.angle, this.attackImg,1.3, 1, "melee1"))
       this.effects["moveLock"] = this.activeAttacks[this.activeAttacks.length-1].moveLock;
       game.attacks.push(this.activeAttacks[this.activeAttacks.length-1])

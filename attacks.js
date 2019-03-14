@@ -14,13 +14,15 @@ var attackData = {
     speed:0,
     moveLock:7,
     effects:{"damage":[1,0,10]},
-    properties:[]
+    properties:[],
+    loop: false,
   },
   "projectile1":{
     speed:8,
     moveLock:5,
     effects:{"damage":[1,0,-1]},
-    properties:[]
+    properties:[],
+    loop: false
   }
 }
 
