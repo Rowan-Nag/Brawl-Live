@@ -276,7 +276,7 @@ class menuButton{
     document.getElementById('canvasDiv').appendChild(document.createElement('p'))
   }
   draw(x, y){
-    ctx.drawImage(this.image, x, this.y+5+this.buttonNum*64, this.width, this.height)
+    ctx.drawImage(this.image, x, this.y+5+this.buttonNum*66, this.width, this.height)
   }
   activate(){
     this.button.disabled = false;
