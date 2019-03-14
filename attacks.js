@@ -1,7 +1,7 @@
 var playerAttacks = {
-  //x, y, attackImg, size scale, attack template
+  //x, y, attackImg, size scale, frames (speed of attack), attack template
   1:{
-    auto:function(x, y, rotation){return new Attack(x, y, "playerOneBasicAttack", 1, "melee1")}
+    auto:function(x, y, rotation){return new Attack(x, y, "playerOneBasicAttack", 1.3, 1, "melee1")}
   }
 }
 
@@ -12,7 +12,7 @@ var attackData = {
   //effects inGame rn: damage
   "melee1":{
     speed:0,
-    moveLock:10,
+    moveLock:7,
     effects:{"damage":[1,0,10]},
     properties:[]
   },

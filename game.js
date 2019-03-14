@@ -342,8 +342,9 @@ class Attack{
 }
 
 class Player{
-  constructor(num, basicAttackImage){
+  constructor(num){
     this.num = num
+    this.attacks = {};
     this.basicAttackImg = playerData.images[num].attack
     this.image = playerData.images[num].down
     this.x = WIDTH/2;
@@ -353,7 +354,7 @@ class Player{
     this.width = 32;
     this.height = 42;
     this.frameX = 0;
-    this.attacks = [];
+    this.activeAttacks = [];
 
     this.downImg=playerData.images[num].down
     this.upImg=playerData.images[num].up
@@ -438,9 +439,9 @@ class Player{
     let xTemp = this.x+0, yTemp = this.y+0
 
     if(keys.q in keyList){
-      this.attacks.push(new Attack(this.x+this.width/2, this.y+this.height/2, -this.angle, this.attackImg,1.3, 1, "melee1"))
-      this.effects["moveLock"] = this.attacks[this.attacks.length-1].moveLock;
-      game.attacks.push(this.attacks[this.attacks.length-1])
+      this.activeAttacks.push(new Attack(this.x+this.width/2, this.y+this.height/2, -this.angle, this.attackImg,1.3, 1, "melee1"))
+      this.effects["moveLock"] = this.activeAttacks[this.activeAttacks.length-1].moveLock;
+      game.attacks.push(this.activeAttacks[this.activeAttacks.length-1])
     }
 
 
