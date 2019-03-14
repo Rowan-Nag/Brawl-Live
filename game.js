@@ -323,9 +323,9 @@ class Attack{
     ctx.translate(x, y)
     ctx.rotate(this.rotation)
     ctx.translate(-x,-y)
-    ctx.drawImage(document.getElementById(this.image), this.frameX*this.currentFrame, 0, this.frameX, this.frameY, x-this.frameX,y-this.frameY, this.frameX*this.size, this.frameY*this.size)
-    ctx.strokeRect(x-this.frameX,y-this.frameY,this.frameX,this.frameY)
-    ctx.stroke();
+    ctx.drawImage(document.getElementById(this.image), this.frameX*this.currentFrame, 0, this.frameX, this.frameY, x-this.size*this.frameX/2,y-this.size*this.frameY, this.frameX*this.size, this.frameY*this.size)
+    //ctx.strokeRect(x-this.frameX/2,y-this.frameY,this.frameX,this.frameY)
+    //ctx.stroke();
     ctx.restore();
   }
   incrementFrame(){
@@ -438,7 +438,7 @@ class Player{
     let xTemp = this.x+0, yTemp = this.y+0
 
     if(keys.q in keyList){
-      this.attacks.push(new Attack(this.x+this.width/2, this.y+this.height/2, -this.angle, this.attackImg,1, 1, "melee1"))
+      this.attacks.push(new Attack(this.x+this.width/2, this.y+this.height/2, -this.angle, this.attackImg,1.3, 1, "melee1"))
       this.effects["moveLock"] = this.attacks[this.attacks.length-1].moveLock;
       game.attacks.push(this.attacks[this.attacks.length-1])
     }
