@@ -290,7 +290,7 @@ class menuButton{
 }
 
 class Attack{
-  constructor(x, y, rotation, image, size, frames, type){
+  constructor(x, y, rotation, image, size, frames, type, player){
     this.x = x;//X/Y starting pos
     this.y = y;
     this.size = size; //size scale
@@ -301,6 +301,7 @@ class Attack{
     this.moveLock = attackData[type].moveLock //frames you can't move
     this.effects = attackData[type].effects; //effects
     this.properties = attackData[type].properties //other properties
+    this.cooldown = attackData[type].cooldown // cooldown of attack
     this.currentFrame = 0; //current frame of animation
     this.image = image
     this.totalFrames = sprites[image].frames; //total frames of the animation
@@ -308,6 +309,7 @@ class Attack{
     this.frameY = sprites[image].ys;
     this.loop = //sprites[image].loop;
     this.ticksPerFrame = this.frames/this.totalFrames;
+    this.player = player
 
 
   }
@@ -375,9 +377,10 @@ class Player{
     this.effects = {
       walking:true,
       "moveLock":0,
+      "autoCooldown":0,
     }
 
-    this.cooldowns = ["moveLock"]
+    this.cooldowns = ["moveLock", "autoCooldown"]
   }
 
   draw(x, y){
@@ -397,7 +400,7 @@ class Player{
 
 
 	  if(keys.q in keysDown){
-		  console.log(this.x)
+
 		  ctx.translate(this.x + 16, this.y + 24);
 
 		  ctx.rotate(-this.angle)
@@ -424,6 +427,7 @@ class Player{
 }
 
   reduceCooldowns(){
+
     for(let i = 0; i < this.cooldowns.length; i++){
 
       this.effects[this.cooldowns[i]] -= 1;
@@ -439,8 +443,12 @@ class Player{
   move(keyList){
     let xTemp = this.x+0, yTemp = this.y+0
 
-    if(mouseDown){
-      this.activeAttacks.push(new Attack(this.x+this.width/2, this.y+this.height/2, -this.angle, this.attackImg,1.3, 1, "melee1"))
+    if(mouseDown && this.effects["autoCooldown"] < 0){
+
+      this.activeAttacks.push(playerAttacks[this.num].auto(this.x+this.width/2,this.y+this.height/2, -this.angle, this))
+
+      this.effects["autoCooldown"] = this.activeAttacks[this.activeAttacks.length-1].cooldown;
+
       this.effects["moveLock"] = this.activeAttacks[this.activeAttacks.length-1].moveLock;
       game.attacks.push(this.activeAttacks[this.activeAttacks.length-1])
     }
@@ -726,6 +734,8 @@ class Game{
     for(let i = 0; i < this.attacks.length; i++){
       this.attacks[i].draw(this.attacks[i].x-this.cameraX+WIDTH/2,this.attacks[i].y-this.cameraY+HEIGHT/2);
       if(this.attacks[i].currentFrame==this.attacks[i].totalFrames){
+      
+        this.attacks[i].player.activeAttacks.splice(i,1)
         this.attacks.splice(i, 1)
         i -= 1
       }
