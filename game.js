@@ -123,6 +123,7 @@ peer.on('connection', function(conn){
       game.player1.x = data[2][0]
       game.player1.y = data[2][1]
       game.player1.image = data[2][2]
+      game.attacks = data[3]
   }
   })
 });
@@ -734,7 +735,7 @@ class Game{
     for(let i = 0; i < this.attacks.length; i++){
       this.attacks[i].draw(this.attacks[i].x-this.cameraX+WIDTH/2,this.attacks[i].y-this.cameraY+HEIGHT/2);
       if(this.attacks[i].currentFrame==this.attacks[i].totalFrames){
-      
+
         this.attacks[i].player.activeAttacks.splice(i,1)
         this.attacks.splice(i, 1)
         i -= 1
@@ -785,6 +786,19 @@ class Game{
   this.state = target/1;
 }
 
+  sendClassData(data){
+    let a = [];
+    for(let i = 0; i < data.length;i++){
+      let o = {}
+      for(let j in data[i]){
+        if(j==="constructor"){
+          continue;
+        }
+        o[j] = data[i][j]
+      }
+    }
+    return a
+  }
 
   stateEngine(){
 
@@ -802,11 +816,17 @@ class Game{
         this.drawMap(this.mapCollision)
         this.drawSprites();
         //this.player1.basicAttack();
-        mainConn.send([5, [this.player1.x,this.player1.y, this.player1.image],[this.player2.x,this.player2.y,this.player2.image]])
+        mainConn.send([5, [this.player1.x,this.player1.y, this.player1.image],[this.player2.x,this.player2.y,this.player2.image], this.sendClassData(this.attacks)])
 
         break;
       case 2://joining
+        this.player1.mouseAngle();
+
         mainConn.send([3, keysDown])
+        this.drawMap(this.map);
+        this.drawMap(this.mapAdds);
+        this.drawSprites();
+        break;
       case 3: //singlePlayer
         this.player1.mouseAngle();
         if(this.player1.effects.moveLock<=0){
@@ -814,7 +834,7 @@ class Game{
         }
         this.drawMap(this.map);
         this.drawMap(this.mapAdds);
-        this.drawMap(this.mapCollision)
+        //this.drawMap(this.mapCollision)
         this.drawSprites();
         //this.player1.basicAttack();
     }
