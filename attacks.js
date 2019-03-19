@@ -40,3 +40,8 @@ var sprites = {
     frames:8
   }
 }
+
+var effects = {
+  walking:function(player){return},
+  
+}

@@ -20,8 +20,8 @@ var keys = {down: 40,
     keysDown = {},
     frameRate = 1/60,
     frameDelay = frameRate*1000,
-    totalMenuButtons = 0,
-    mouseDown = false
+    totalMenuButtons = 0
+
 
 
 window.addEventListener('mousemove', initiatePos, false);
@@ -118,7 +118,7 @@ peer.on('connection', function(conn){
       game.player2.x = data[1][0];
       game.player2.y = data[1][1];
       game.player2.image = data[1][2];
-      
+
       game.player2.effects = data[1][4];
 
       game.player1.x = data[2][0];
@@ -126,6 +126,10 @@ peer.on('connection', function(conn){
       game.player1.image = data[2][2];
 
       game.player1.effects = data[2][4];
+      break;
+    case 6:
+      game.attacks.push(new Attack(data[1],data[2],data[3],data[4],data[5],data[6],data[7],game.player1))
+      console.log(game.attacks[0])
   }
   })
 });
@@ -356,7 +360,7 @@ class Player{
     this.image = playerData.images[num].down
     this.x = WIDTH/2;
     this.y = HEIGHT/2;
-    this.speed = 4;
+    this.speed = 6;
     this.facing = 0;
     this.width = 32;
     this.height = 42;
@@ -437,55 +441,63 @@ class Player{
       this.effects[this.cooldowns[i]] -= 1;
     }
   }
-  mouseAngle(){
+  mouseAngle(keyList){
 
 	 this.angle = Math.atan2(this.x+this.width/2 - mouseX, this.y+this.height/2 - mouseY)
-
+   keyList["mouseAngle"] = this.angle
 
   }
 
   move(keyList){
     let xTemp = this.x+0, yTemp = this.y+0
 
-    if(mouseDown && this.effects["autoCooldown"] < 0){
+    if(keyList['mouseDown'] && this.effects["autoCooldown"] < 0){
 
-      this.activeAttacks.push(playerAttacks[this.num].auto(this.x+this.width/2,this.y+this.height/2, -this.angle, this))
+      this.activeAttacks.push(playerAttacks[this.num].auto(this.x+this.width/2,this.y+this.height/2, -keyList["mouseAngle"], this))
 
       this.effects["autoCooldown"] = this.activeAttacks[this.activeAttacks.length-1].cooldown;
 
       this.effects["moveLock"] = this.activeAttacks[this.activeAttacks.length-1].moveLock;
-      game.attacks.push(this.activeAttacks[this.activeAttacks.length-1])
+      console.log(this.effects["moveLock"])
+      game.addAttack(this.activeAttacks[this.activeAttacks.length-1])
+
+
     }
 
 
     if(keys.a in keyList){
-      this.x -= this.speed
+      this.x -= .1
       this.image = this.leftImg
 
     }
 
     if(keys.d in keyList){
-      this.x += this.speed
+      this.x += .1
       this.image = this.rightImg
     }
 
     if(keys.w in keyList){
-      this.y -= this.speed
+      this.y -= .1
       this.image = this.upImg
     }
 
     if(keys.s in keyList){
-      this.y += this.speed
+      this.y += .1
       this.image = this.downImg
     }
     let dy = this.y-yTemp
     let dx = this.x-xTemp
+
+    this.facing = Math.atan2(this.y-yTemp, this.x-xTemp)
     if(dy == 0 && dx == 0){
       this.effects.walking = false
+
     }else{
       this.effects.walking = true
+      this.x += Math.cos(this.facing)*this.speed;
+      this.y += Math.sin(this.facing)*this.speed;
     }
-    this.facing = Math.atan2(this.y-yTemp, this.x-xTemp)
+
     for(let i = 0; i <game.mapCollision.length; i++){
       if(collision({x:this.x,y:this.y-dy,width:this.width,height:this.height}, game.mapCollision[i])){
         if(dx < 0){
@@ -533,6 +545,7 @@ class Game{
   constructor(){
     this.player1 = new Player(1)
     this.player2 = new Player(1);
+
     this.p2Keys = {};
     this.state = 0;
     this.attacks = [];
@@ -734,12 +747,18 @@ class Game{
   return target
   }
 
+  addAttack(attack){
+    this.attacks.push(attack)
+    mainConn.send([6, attack.x, attack.y, attack.rotation, attack.image, attack.size, attack.frames, attack.type, undefined])
+  }
+
   drawSprites(){
     for(let i = 0; i < this.attacks.length; i++){
       this.attacks[i].draw(this.attacks[i].x-this.cameraX+WIDTH/2,this.attacks[i].y-this.cameraY+HEIGHT/2);
       if(this.attacks[i].currentFrame==this.attacks[i].totalFrames){
-
+        if(hosting){
         this.attacks[i].player.activeAttacks.splice(i,1)
+        }
         this.attacks.splice(i, 1)
         i -= 1
       }
@@ -799,9 +818,14 @@ class Game{
         this.drawMenu(this.currentMenu);
         break;
       case 1: //hosting
-        this.player1.mouseAngle();
-        this.player1.move(keysDown);
-        this.player2.move(this.p2Keys)
+        this.player1.mouseAngle(keysDown);
+        if(this.player1.effects.moveLock<=0){
+          this.player1.move(keysDown);
+        }
+        if(this.player2.effects.moveLock<=0){
+          this.player2.move(this.p2Keys)
+        }
+
         this.drawMap(this.map);
         this.drawMap(this.mapAdds);
         this.drawMap(this.mapCollision)
@@ -814,7 +838,8 @@ class Game{
 
         break;
       case 2://joining
-        this.player1.mouseAngle();
+
+        this.player1.mouseAngle(keysDown);
 
         mainConn.send([3, keysDown])
         this.drawMap(this.map);
@@ -822,7 +847,7 @@ class Game{
         this.drawSprites();
         break;
       case 3: //singlePlayer
-        this.player1.mouseAngle();
+        this.player1.mouseAngle(keysDown);
         if(this.player1.effects.moveLock<=0){
           this.player1.move(keysDown);
         }
@@ -850,6 +875,7 @@ function updateTicks(){
 
   ticks += 1
   game.player1.reduceCooldowns();
+  game.player2.reduceCooldowns();
   if(game.player1.effects.walking && ticks%4 <1){
     game.player1.incrementFrame(2)
   }
