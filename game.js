@@ -16,7 +16,8 @@ var keys = {down: 40,
             q: 81,
             w: 87,
             e: 69,
-            r: 82,},
+            r: 82,
+            space:32,},
     keysDown = {},
     frameRate = 1/60,
     frameDelay = frameRate*1000,
@@ -382,13 +383,9 @@ class Player{
 
     this.delay = 0
 
-    this.effects = {
-      walking:true,
-      "moveLock":0,
-      "autoCooldown":0,
-    }
+    this.effects = playerEffects.allEffects()
 
-    this.cooldowns = ["moveLock", "autoCooldown"]
+    this.cooldowns = ["moveLock", "autoCooldown", "rolling"]
   }
 
   draw(x, y){
@@ -465,6 +462,7 @@ class Player{
     }
 
 
+
     if(keys.a in keyList){
       this.x -= .1
       this.image = this.leftImg
@@ -496,6 +494,9 @@ class Player{
       this.effects.walking = true
       this.x += Math.cos(this.facing)*this.speed;
       this.y += Math.sin(this.facing)*this.speed;
+    }
+    if(keys.space in keyList){
+
     }
 
     for(let i = 0; i <game.mapCollision.length; i++){

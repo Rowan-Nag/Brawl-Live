@@ -2,8 +2,17 @@ var playerAttacks = {
   //x, y, attackImg, size scale, frames (speed of attack), attack template
   1:{
     auto:function(x, y, rotation, player){return new Attack(x, y,rotation, "playerOneBasicAttack", 1.3, 1, "melee1", player)}
-  }
+
+
+  },
+  2:{
+    auto:function(x, y, rotation, player){return new Attack(x, y,rotation, "playerTwoBasicAttack", 1.3, 1, "melee1", player)}
+
+
+  },
+
 }
+
 
 var attackData = {
   //20 ticks = 1 second
@@ -41,7 +50,12 @@ var sprites = {
   }
 }
 
-var effects = {
-  walking:function(player){return},
-  
+var playerEffects = {
+  allEffects: function(){return {
+  walking:true,
+  "moveLock":0,
+  "autoCooldown":0,
+  "rolling":0,
 }
+
+}}
