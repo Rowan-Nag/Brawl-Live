@@ -315,8 +315,8 @@ class Attack{
     this.currentFrame = 0; //current frame of animation
     this.image = image
     this.totalFrames = sprites[image].frames; //total frames of the animation
-    this.frameX = sprites[image].xs;
-    this.frameY = sprites[image].ys;
+    this.frameX = 64 //sprites[image].xs; width/height of each frame
+    this.frameY = 64 //sprites[image].ys;
     this.loop = //sprites[image].loop;
     this.ticksPerFrame = this.frames/this.totalFrames;
     this.player = player
