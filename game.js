@@ -115,15 +115,17 @@ peer.on('connection', function(conn){
       this.player2 = new Player(data[1])
       break;
     case 5:
-      game.player2.x = data[1][0]
-      game.player2.y = data[1][1]
-      game.player2.image = data[1][2]
+      game.player2.x = data[1][0];
+      game.player2.y = data[1][1];
+      game.player2.image = data[1][2];
+      
+      game.player2.effects = data[1][4];
 
+      game.player1.x = data[2][0];
+      game.player1.y = data[2][1];
+      game.player1.image = data[2][2];
 
-      game.player1.x = data[2][0]
-      game.player1.y = data[2][1]
-      game.player1.image = data[2][2]
-      game.attacks = data[3]
+      game.player1.effects = data[2][4];
   }
   })
 });
@@ -241,6 +243,9 @@ function howToPlay(){
 	game.switchMenu(game.menus.howToPlay)
 }
 
+
+
+
 class Tile{
   constructor(x, y, width, height, type, collision){
     this.x = x;
@@ -342,9 +347,7 @@ class Attack{
       }
     }
   }
-
 }
-
 class Player{
   constructor(num){
     this.num = num
@@ -786,19 +789,7 @@ class Game{
   this.state = target/1;
 }
 
-  sendClassData(data){
-    let a = [];
-    for(let i = 0; i < data.length;i++){
-      let o = {}
-      for(let j in data[i]){
-        if(j==="constructor"){
-          continue;
-        }
-        o[j] = data[i][j]
-      }
-    }
-    return a
-  }
+
 
   stateEngine(){
 
@@ -816,7 +807,10 @@ class Game{
         this.drawMap(this.mapCollision)
         this.drawSprites();
         //this.player1.basicAttack();
-        mainConn.send([5, [this.player1.x,this.player1.y, this.player1.image],[this.player2.x,this.player2.y,this.player2.image], this.sendClassData(this.attacks)])
+        mainConn.send([5,
+                      [this.player1.x,this.player1.y, this.player1.image, this.player1.frameX, this.player1.effects],
+                      [this.player2.x,this.player2.y, this.player2.image, this.player2.frameX, this.player2.effects],
+                      []])
 
         break;
       case 2://joining
@@ -856,8 +850,11 @@ function updateTicks(){
 
   ticks += 1
   game.player1.reduceCooldowns();
-  if(game.player1.effects.walking && ticks%4 ==0){
+  if(game.player1.effects.walking && ticks%4 <1){
     game.player1.incrementFrame(2)
+  }
+  if(game.player2.effects.walking && ticks%4 <1){
+    game.player2.incrementFrame(2)
   }
   for(let i = 0; i < game.attacks.length; i++){
     if(ticks%game.attacks[i].ticksPerFrame<1){
