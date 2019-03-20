@@ -7,7 +7,7 @@ var playerAttacks = {
   },
   2:{
     auto:function(x, y, rotation, player){return new Attack(x, y,rotation, "playerTwoBasicAttack", 1.3, 1, "melee1", player)}
-
+    roll:function(x, y, rotation, player){player.effects["rolling"]}
 
   },
 

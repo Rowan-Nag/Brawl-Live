@@ -120,13 +120,13 @@ peer.on('connection', function(conn){
       game.player2.y = data[1][1];
       game.player2.image = data[1][2];
 
-      game.player2.effects = data[1][4];
+      game.player2.cooldownEffects = data[1][4];
 
       game.player1.x = data[2][0];
       game.player1.y = data[2][1];
       game.player1.image = data[2][2];
 
-      game.player1.effects = data[2][4];
+      game.player1.cooldownEffects = data[2][4];
       break;
     case 6:
       game.attacks.push(new Attack(data[1],data[2],data[3],data[4],data[5],data[6],data[7],game.player1))
@@ -367,7 +367,7 @@ class Player{
     this.height = 42;
     this.frameX = 0;
     this.activeAttacks = [];
-
+    this.walking = false
     this.downImg=playerData.images[num].down
     this.upImg=playerData.images[num].up
     this.leftImg=playerData.images[num].left
@@ -383,9 +383,9 @@ class Player{
 
     this.delay = 0
 
-    this.effects = playerEffects.allEffects()
-
-    this.cooldowns = ["moveLock", "autoCooldown", "rolling"]
+    this.cooldownEffects = {"moveLock":0,"autoCd":0}
+    this.effects = {}
+    this.cooldowns = ["moveLock", "autoCd", "rolling"]
   }
 
   draw(x, y){
@@ -446,16 +446,17 @@ class Player{
   }
 
   move(keyList){
-    let xTemp = this.x+0, yTemp = this.y+0
 
-    if(keyList['mouseDown'] && this.effects["autoCooldown"] < 0){
+    let dx = 0,dy = 0, hCollision= false, vCollision = false
+
+    if(keyList['mouseDown'] && this.cooldownEffects["autoCd"] < 0){
 
       this.activeAttacks.push(playerAttacks[this.num].auto(this.x+this.width/2,this.y+this.height/2, -keyList["mouseAngle"], this))
 
-      this.effects["autoCooldown"] = this.activeAttacks[this.activeAttacks.length-1].cooldown;
+      this.cooldownEffects["autoCd"] = this.activeAttacks[this.activeAttacks.length-1].cooldown;
 
-      this.effects["moveLock"] = this.activeAttacks[this.activeAttacks.length-1].moveLock;
-      console.log(this.effects["moveLock"])
+      this.cooldownEffects["moveLock"] = this.activeAttacks[this.activeAttacks.length-1].moveLock;
+      console.log(this.cooldownEffects["moveLock"])
       game.addAttack(this.activeAttacks[this.activeAttacks.length-1])
 
 
@@ -464,57 +465,67 @@ class Player{
 
 
     if(keys.a in keyList){
-      this.x -= .1
+      dx -= 1
       this.image = this.leftImg
 
     }
 
     if(keys.d in keyList){
-      this.x += .1
+      dx += 1
       this.image = this.rightImg
     }
 
     if(keys.w in keyList){
-      this.y -= .1
+      dy -= 1
       this.image = this.upImg
     }
 
     if(keys.s in keyList){
-      this.y += .1
+      dy += 1
       this.image = this.downImg
     }
-    let dy = this.y-yTemp
-    let dx = this.x-xTemp
 
-    this.facing = Math.atan2(this.y-yTemp, this.x-xTemp)
+
+    this.facing = Math.atan2(dy, dx)
     if(dy == 0 && dx == 0){
-      this.effects.walking = false
+
+      this.walking = false
 
     }else{
-      this.effects.walking = true
-      this.x += Math.cos(this.facing)*this.speed;
-      this.y += Math.sin(this.facing)*this.speed;
+      this.walking = true
+      dx = Math.cos(this.facing)*this.speed;
+      dy = Math.sin(this.facing)*this.speed;
     }
     if(keys.space in keyList){
 
     }
 
     for(let i = 0; i <game.mapCollision.length; i++){
-      if(collision({x:this.x,y:this.y-dy,width:this.width,height:this.height}, game.mapCollision[i])){
-        if(dx < 0){
-          this.x = game.mapCollision[i].x+game.mapCollision[i].width+2;}
-        if(dx > 0){
-          this.x = game.mapCollision[i].x-this.width-2}
-        console.log('collide horizontally')
-      }
-      if(collision({x:this.x-dx,y:this.y,width:this.width,height:this.height}, game.mapCollision[i])){
-        if(dy < 0){
-          this.y = game.mapCollision[i].y+game.mapCollision[i].height+2;}
-        if(dy > 0){
-          this.y = game.mapCollision[i].y-this.height-2}
-        console.log('collide vertically')
-      }
+      if(collision({x:this.x+dx,y:this.y,width:this.width,height:this.height}, game.mapCollision[i])){
+          hCollision = true;
 
+          //this.x = game.mapCollision[i].x+game.mapCollision[i].width+5;}
+      }
+      if(collision({x:this.x,y:this.y+dy,width:this.width,height:this.height}, game.mapCollision[i])){
+          vCollision = true;
+
+        /*if(dy < 0){
+          this.y = game.mapCollision[i].y+game.mapCollision[i].height+5;}
+        if(dy > 0){
+          this.y = game.mapCollision[i].y-this.height-5}
+        console.log('collide vertically')*/
+      }
+      if(!vCollision && !hCollision){if(collision({x:this.x+dx,y:this.y+dy,width:this.width,height:this.height}, game.mapCollision[i])){
+          hCollision = true;
+          vCollision = true;
+        }
+    }
+  }
+    if(!hCollision){
+      this.x += dx;
+    }
+    if(!vCollision){
+      this.y += dy;
     }
 
     if(this.x < 0){
@@ -820,10 +831,10 @@ class Game{
         break;
       case 1: //hosting
         this.player1.mouseAngle(keysDown);
-        if(this.player1.effects.moveLock<=0){
+        if(this.player1.cooldownEffects.moveLock<=0){
           this.player1.move(keysDown);
         }
-        if(this.player2.effects.moveLock<=0){
+        if(this.player2.cooldownEffects.moveLock<=0){
           this.player2.move(this.p2Keys)
         }
 
@@ -833,8 +844,8 @@ class Game{
         this.drawSprites();
         //this.player1.basicAttack();
         mainConn.send([5,
-                      [this.player1.x,this.player1.y, this.player1.image, this.player1.frameX, this.player1.effects],
-                      [this.player2.x,this.player2.y, this.player2.image, this.player2.frameX, this.player2.effects],
+                      [this.player1.x,this.player1.y, this.player1.image, this.player1.frameX, this.player1.cooldownEffects],
+                      [this.player2.x,this.player2.y, this.player2.image, this.player2.frameX, this.player2.cooldownEffects],
                       []])
 
         break;
@@ -849,7 +860,7 @@ class Game{
         break;
       case 3: //singlePlayer
         this.player1.mouseAngle(keysDown);
-        if(this.player1.effects.moveLock<=0){
+        if(this.player1.cooldownEffects.moveLock<=0){
           this.player1.move(keysDown);
         }
         this.drawMap(this.map);
@@ -877,10 +888,10 @@ function updateTicks(){
   ticks += 1
   game.player1.reduceCooldowns();
   game.player2.reduceCooldowns();
-  if(game.player1.effects.walking && ticks%4 <1){
+  if(game.player1.walking && ticks%4 <1){
     game.player1.incrementFrame(2)
   }
-  if(game.player2.effects.walking && ticks%4 <1){
+  if(game.player2.walking && ticks%4 <1){
     game.player2.incrementFrame(2)
   }
   for(let i = 0; i < game.attacks.length; i++){
