@@ -6,7 +6,7 @@ var playerAttacks = {
 
   },
   2:{
-    auto:function(x, y, rotation, player){return new Attack(x, y,rotation, "playerTwoBasicAttack", 1.3, 1, "melee1", player)}
+    auto:function(x, y, rotation, player){return new Attack(x, y,rotation, "playerTwoBasicAttack", 1.3, 1, "melee1", player)},
     roll:function(x, y, rotation, player){player.effects["rolling"]}
 
   },
@@ -21,11 +21,11 @@ var attackData = {
   //effects inGame rn: damage
   "melee1":{
     speed:0,
-    moveLock:7,
+    moveLock:7,// 7
     effects:{"damage":[1,0,10]},
     properties:[],
     loop: false,
-    cooldown:12,
+    cooldown:12, //12
   },
   "projectile1":{
     speed:8,

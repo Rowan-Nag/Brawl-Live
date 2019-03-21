@@ -167,6 +167,10 @@ function collision(a, b){
    a.y + a.height > b.y)
 }
 
+function OBBCollide(a, b){
+  //*you're gonna have a bad time*
+}
+
 function addText(string, x, y, size, color){
   ctx.font = size+"px Arial";
   ctx.fillStyle = color;
@@ -322,6 +326,28 @@ class Attack{
     this.ticksPerFrame = this.frames/this.totalFrames;
     this.player = player
 
+    this.tr = {x:this.x+this.frameX*this.size,y:this.y-this.frameY*this.size/2}
+    this.tl = {x:this.x,y:this.y-this.frameY*this.size/2}
+    this.bl = {x:this.x,y:this.y+this.frameY*this.size/2}
+    this.br = {x:this.x+this.frameX*this.size,y:this.y+this.frameY*this.size/2}
+
+    this.tr = this.rotateCorner(this.tr)
+    this.tl = this.rotateCorner(this.tl)
+    this.bl = this.rotateCorner(this.bl)
+    this.br = this.rotateCorner(this.br)
+
+  }
+  rotateCorner(corner){
+    let tempR = this.rotation -Math.PI/2
+    let cX = this.player.x+this.player.width/2
+    let cY = this.player.y+this.player.height/2
+    let tempX = corner.x-cX;
+    let tempY = corner.y-cY;
+
+    let rtdX = tempX*Math.cos(tempR) - tempY*Math.sin(-tempR);
+    let rtdY = tempX*Math.sin(-tempR) + tempY*Math.cos(tempR);
+
+    return({x:rtdX+cX,y:-rtdY+cY})
 
   }
   move(){
@@ -338,9 +364,18 @@ class Attack{
     ctx.rotate(this.rotation)
     ctx.translate(-x,-y)
     ctx.drawImage(document.getElementById(this.image), this.frameX*this.currentFrame, 0, this.frameX, this.frameY, x-this.size*this.frameX/2,y-this.size*this.frameY, this.frameX*this.size, this.frameY*this.size)
-    //ctx.strokeRect(x-this.frameX/2,y-this.frameY,this.frameX,this.frameY)
+    //ctx.strokeRect(x-this.size*this.frameX/2,y-this.frameY*this.size,this.frameX*this.size,this.frameY*this.size)
     //ctx.stroke();
     ctx.restore();
+    /*
+    ctx.strokeStyle = "#00000";
+    ctx.beginPath();
+    ctx.moveTo(this.tr.x, this.tr.y);
+    ctx.lineTo(this.tl.x, this.tl.y);
+    ctx.lineTo(this.bl.x, this.bl.y);
+    ctx.lineTo(this.br.x, this.br.y);
+    ctx.stroke();
+    */
   }
   incrementFrame(){
     this.currentFrame += 1;
@@ -374,7 +409,11 @@ class Player{
     this.rightImg=playerData.images[num].right
     this.attackImg= playerData.images[num].attack
     console.log(this.downImg, 500)
-
+    //collision variables
+    this.tr= {x:this.x+this.width,y:this.y}
+    this.br= {x:this.x+this.width,y:this.y+this.height}
+    this.tl= {x:this.x,y:this.y}
+    this.bl= {x:this.x,y:this.y+this.height}
 
     this.basicAttackX = 0
 
@@ -383,7 +422,7 @@ class Player{
 
     this.delay = 0
 
-    this.cooldownEffects = {"moveLock":0,"autoCd":0}
+    this.cooldownEffects = {"moveLock":0,"autoCd":0, "rolling":0}
     this.effects = {}
     this.cooldowns = ["moveLock", "autoCd", "rolling"]
   }
@@ -431,11 +470,13 @@ class Player{
   }
 }
 
+
+
   reduceCooldowns(){
 
     for(let i = 0; i < this.cooldowns.length; i++){
 
-      this.effects[this.cooldowns[i]] -= 1;
+      this.cooldownEffects[this.cooldowns[i]] -= 1;
     }
   }
   mouseAngle(keyList){
@@ -456,7 +497,7 @@ class Player{
       this.cooldownEffects["autoCd"] = this.activeAttacks[this.activeAttacks.length-1].cooldown;
 
       this.cooldownEffects["moveLock"] = this.activeAttacks[this.activeAttacks.length-1].moveLock;
-      console.log(this.cooldownEffects["moveLock"])
+
       game.addAttack(this.activeAttacks[this.activeAttacks.length-1])
 
 
@@ -653,6 +694,16 @@ class Game{
 
   }
 
+  attackCollision(){
+    for(let i = 0; i < this.attacks.length; i++){
+      if(this.attacks[i].player == this.player1){
+        OBBCollide(this.attacks[i],this.player2)
+      }else if(this.attacks[i].player == this.player2){
+        OBBCollide(this.attacks[i],this.player1)
+      }
+    }
+  }
+
   genNewMap(w, h){
     let a = [];
 
@@ -761,7 +812,9 @@ class Game{
 
   addAttack(attack){
     this.attacks.push(attack)
+    if(hosting){
     mainConn.send([6, attack.x, attack.y, attack.rotation, attack.image, attack.size, attack.frames, attack.type, undefined])
+    }
   }
 
   drawSprites(){
