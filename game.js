@@ -168,13 +168,68 @@ function collision(a, b){
 }
 
 function OBBCollide(a, b){
-  //*you're gonna have a bad time*
+
+  let newtr = rotateCorner(0,0,b.tr,a.rotation);
+  let newtl = rotateCorner(0,0,b.tl,a.rotation);
+  let newbr = rotateCorner(0,0,b.br,a.rotation);
+  let newbl = rotateCorner(0,0,b.bl,a.rotation);
+
+  //really need to change this bit:
+  let maxAx = Math.max(a.tr.x,a.tl.x,a.br.x,a.bl.x)
+  let minAx = Math.min(a.tr.x,a.tl.x,a.br.x,a.bl.x)
+  let maxAy = Math.max(a.tr.y,a.tl.y,a.br.y,a.bl.y)
+  let minAy = Math.min(a.tr.y,a.tl.y,a.br.y,a.bl.y)
+
+  let maxBx = Math.max(newtr.x,newtl.x,newbr.x,newbl.x)
+  let minBx = Math.min(newtr.x,newtl.x,newbr.x,newbl.x)
+  let maxBy = Math.max(newtr.y,newtl.y,newbr.y,newbl.y)
+  let minBy = Math.min(newtr.y,newtl.y,newbr.y,newbl.y)
+
+  if(maxAx < minBx || maxBx < minAx || maxAy < minBy || maxBy < minAy){
+    return false
+  }
+  let newAtr = rotateCorner(0,0,a.tr,b.rotation);
+  let newBtl = rotateCorner(0,0,a.tl,b.rotation);
+  let newBbr = rotateCorner(0,0,a.br,b.rotation);
+  let newBbl = rotateCorner(0,0,a.bl,b.rotation);
+
+  maxBx = Math.max(b.tr.x,b.tl.x,b.br.x,b.bl.x)
+  minBx = Math.min(b.tr.x,b.tl.x,b.br.x,b.bl.x)
+  maxBy = Math.max(b.tr.y,b.tl.y,b.br.y,b.bl.y)
+  minBy = Math.min(b.tr.y,b.tl.y,b.br.y,b.bl.y)
+
+  maxAx = Math.max(newtr.x,newtl.x,newbr.x,newbl.x)
+  minAx = Math.min(newtr.x,newtl.x,newbr.x,newbl.x)
+  maxAy = Math.max(newtr.y,newtl.y,newbr.y,newbl.y)
+  minAy = Math.min(newtr.y,newtl.y,newbr.y,newbl.y)
+
+  if(maxAx < minBx || maxBx < minAx || maxAy < minBy || maxBy < minAy){
+    return false
+  }
+  return true
+}
+
+function rotateCorner(cx, cy, corner, rotation){
+  if(rotation%Math.PI*2 == 0){
+    return({x:corner.x,y:corner.y})
+  }
+  let tempR = rotation -Math.PI/2
+  let tempX = corner.x-cx;
+  let tempY = corner.y-cy;
+
+  let rtdX = tempX*Math.cos(tempR) - tempY*Math.sin(-tempR);
+  let rtdY = tempX*Math.sin(-tempR) + tempY*Math.cos(tempR);
+
+  return({x:rtdX+cx,y:-rtdY+cy})
+
 }
 
 function addText(string, x, y, size, color){
+  ctx.save();
   ctx.font = size+"px Arial";
   ctx.fillStyle = color;
-  return ctx.strokeText(string, x, y);
+  ctx.strokeText(string, x, y);
+  ctx.restore();
 }
 
 
@@ -312,6 +367,7 @@ class Attack{
     this.rotation = rotation; //rotation in radians
     this.frames = frames; //frames the attack lasts
     this.type = type //type (check attackData in mapData.js)
+    this.hitstun = attackData[type].hitstun; //frames that the target can't be hit for after.
     this.speed = attackData[type].speed; //speed
     this.moveLock = attackData[type].moveLock //frames you can't move
     this.effects = attackData[type].effects; //effects
@@ -325,31 +381,19 @@ class Attack{
     this.loop = //sprites[image].loop;
     this.ticksPerFrame = this.frames/this.totalFrames;
     this.player = player
-
+    this.hitPlayers = [];
     this.tr = {x:this.x+this.frameX*this.size,y:this.y-this.frameY*this.size/2}
     this.tl = {x:this.x,y:this.y-this.frameY*this.size/2}
     this.bl = {x:this.x,y:this.y+this.frameY*this.size/2}
     this.br = {x:this.x+this.frameX*this.size,y:this.y+this.frameY*this.size/2}
 
-    this.tr = this.rotateCorner(this.tr)
-    this.tl = this.rotateCorner(this.tl)
-    this.bl = this.rotateCorner(this.bl)
-    this.br = this.rotateCorner(this.br)
+    this.tr = rotateCorner(this.player.x+this.player.width/2, this.player.y+this.player.height/2,this.tr, this.rotation)
+    this.tl = rotateCorner(this.player.x+this.player.width/2, this.player.y+this.player.height/2,this.tl, this.rotation)
+    this.bl = rotateCorner(this.player.x+this.player.width/2, this.player.y+this.player.height/2,this.bl, this.rotation)
+    this.br = rotateCorner(this.player.x+this.player.width/2, this.player.y+this.player.height/2,this.br, this.rotation)
 
   }
-  rotateCorner(corner){
-    let tempR = this.rotation -Math.PI/2
-    let cX = this.player.x+this.player.width/2
-    let cY = this.player.y+this.player.height/2
-    let tempX = corner.x-cX;
-    let tempY = corner.y-cY;
 
-    let rtdX = tempX*Math.cos(tempR) - tempY*Math.sin(-tempR);
-    let rtdY = tempX*Math.sin(-tempR) + tempY*Math.cos(tempR);
-
-    return({x:rtdX+cX,y:-rtdY+cY})
-
-  }
   move(){
     if(this.speed > 0){
       this.x += this.speed*Math.cos(this.rotation);
@@ -396,6 +440,7 @@ class Player{
     this.image = playerData.images[num].down
     this.x = WIDTH/2;
     this.y = HEIGHT/2;
+    this.health = 100;
     this.speed = 6;
     this.facing = 0;
     this.width = 32;
@@ -408,6 +453,7 @@ class Player{
     this.leftImg=playerData.images[num].left
     this.rightImg=playerData.images[num].right
     this.attackImg= playerData.images[num].attack
+    this.rotation = 0
     console.log(this.downImg, 500)
     //collision variables
     this.tr= {x:this.x+this.width,y:this.y}
@@ -422,9 +468,9 @@ class Player{
 
     this.delay = 0
 
-    this.cooldownEffects = {"moveLock":0,"autoCd":0, "rolling":0}
+    this.cooldownEffects = {"moveLock":0,"autoCd":0, "rolling":0, "invulnerability":0}
     this.effects = {}
-    this.cooldowns = ["moveLock", "autoCd", "rolling"]
+    this.cooldowns = ["moveLock", "autoCd", "rolling", "invulnerability"]
   }
 
   draw(x, y){
@@ -592,6 +638,11 @@ class Player{
     }
   }
 
+  applyEffects(effectList){
+    for(let i = 0; i< effectList.length; i++){
+      effectDict[effectList[i][0]](effectList[i][1], this)
+    }
+  }
 }
 
 class Game{
@@ -696,10 +747,20 @@ class Game{
 
   attackCollision(){
     for(let i = 0; i < this.attacks.length; i++){
-      if(this.attacks[i].player == this.player1){
-        OBBCollide(this.attacks[i],this.player2)
-      }else if(this.attacks[i].player == this.player2){
-        OBBCollide(this.attacks[i],this.player1)
+
+      if(this.attacks[i].player == this.player1 && this.player2.cooldownEffects.invulnerability < 0){
+
+        if(OBBCollide(this.player2,this.attacks[i])){
+          this.player2.cooldownEffects.invulnerability =20
+          this.player2.applyEffects(this.attacks[i].effects)
+          console.log("HIT")
+        }
+      }else if(this.attacks[i].player == this.player2 && this.player1.cooldownEffects.invulnerability < 0){
+        if(OBBCollide(this.player1,this.attacks[i])){
+          this.player1.cooldownEffects.invulnerability =20
+          this.player1.applyEffects(this.attacks[i].effects)
+          console.log("HIT")
+        }
       }
     }
   }
@@ -806,6 +867,7 @@ class Game{
       }
     target.push(b)
     }
+
 
   return target
   }
@@ -916,6 +978,7 @@ class Game{
         if(this.player1.cooldownEffects.moveLock<=0){
           this.player1.move(keysDown);
         }
+        this.attackCollision();
         this.drawMap(this.map);
         this.drawMap(this.mapAdds);
         //this.drawMap(this.mapCollision)

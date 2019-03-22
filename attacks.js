@@ -22,18 +22,22 @@ var attackData = {
   "melee1":{
     speed:0,
     moveLock:7,// 7
-    effects:{"damage":[1,0,10]},
+    hits:100,
+    effects:[["damage",[0,10]]],
     properties:[],
     loop: false,
     cooldown:12, //12
+
   },
   "projectile1":{
     speed:8,
     moveLock:5,
-    effects:{"damage":[1,0,-1]},
+    hits:2,
+    effects:[["damage",[0,3]]],
     properties:[],
     loop: false,
     cooldown:25,
+
   }
 }
 
@@ -57,5 +61,10 @@ var playerEffects = {
   "autoCooldown":0,
   "rolling":0,
 }
-
 }}
+var effectDict = {
+  "damage": function(data, player){
+    player.health -= data[1]
+    console.log(player, player.health)
+  }
+}
