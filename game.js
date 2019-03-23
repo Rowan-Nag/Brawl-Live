@@ -3,8 +3,8 @@ ctx = canvas.getContext('2d');
 WIDTH = canvas.width;
 HEIGHT = canvas.height;
 ctx.fillRect(0,0,WIDTH,HEIGHT)
-var ticks = 0
-
+var ticks = 0;
+ctx.imageSmoothingEnabled = false;
 var keys = {down: 40,
             up: 38,
             left: 37,
@@ -440,6 +440,7 @@ class Player{
     this.image = playerData.images[num].down
     this.x = WIDTH/2;
     this.y = HEIGHT/2;
+    this.maxHealth = 100
     this.health = 100;
     this.speed = 6;
     this.facing = 0;
@@ -474,9 +475,14 @@ class Player{
   }
 
   draw(x, y){
-    ctx.imageSmoothingEnabled = false
-    ctx.drawImage(document.getElementById(this.image),32*this.frameX, 0, 32, 42, x, y, this.width, this.height);
 
+
+    if(this.frameX%2 == 0 && this.cooldownEffects["invulnerability"] > 0){
+      ctx.globalAlpha = .7
+    }
+    ctx.drawImage(document.getElementById(this.image),32*this.frameX, 0, 32, 42, x, y, this.width, this.height);
+    ctx.globalAlpha = 1
+    this.drawHealth(x, y-20)
   }
   incrementFrame(numFrames) {
     this.frameX += 1
@@ -516,7 +522,14 @@ class Player{
   }
 }
 
-
+  drawHealth(x, y){
+    ctx.save();
+    ctx.fillStyle = "red"
+    ctx.fillRect(x-this.maxHealth/2, y, this.maxHealth, 10)
+    ctx.fillStyle = "green"
+    ctx.fillRect(x-this.maxHealth/2, y, this.maxHealth-(this.maxHealth-this.health)/2, 10);
+    ctx.restore();
+  }
 
   reduceCooldowns(){
 
@@ -751,13 +764,13 @@ class Game{
       if(this.attacks[i].player == this.player1 && this.player2.cooldownEffects.invulnerability < 0){
 
         if(OBBCollide(this.player2,this.attacks[i])){
-          this.player2.cooldownEffects.invulnerability =20
+          this.player2.cooldownEffects.invulnerability = 10
           this.player2.applyEffects(this.attacks[i].effects)
           console.log("HIT")
         }
       }else if(this.attacks[i].player == this.player2 && this.player1.cooldownEffects.invulnerability < 0){
         if(OBBCollide(this.player1,this.attacks[i])){
-          this.player1.cooldownEffects.invulnerability =20
+          this.player1.cooldownEffects.invulnerability = 10
           this.player1.applyEffects(this.attacks[i].effects)
           console.log("HIT")
         }
