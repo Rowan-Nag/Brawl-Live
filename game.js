@@ -119,13 +119,13 @@ peer.on('connection', function(conn){
       game.player2.x = data[1][0];
       game.player2.y = data[1][1];
       game.player2.image = data[1][2];
-
+      game.player2.health = data[1][3];
       game.player2.cooldownEffects = data[1][4];
 
       game.player1.x = data[2][0];
       game.player1.y = data[2][1];
       game.player1.image = data[2][2];
-
+      game.player1.health = data[2][3]
       game.player1.cooldownEffects = data[2][4];
       break;
     case 6:
@@ -972,8 +972,8 @@ class Game{
         this.drawSprites();
         //this.player1.basicAttack();
         mainConn.send([5,
-                      [this.player1.x,this.player1.y, this.player1.image, this.player1.frameX, this.player1.cooldownEffects],
-                      [this.player2.x,this.player2.y, this.player2.image, this.player2.frameX, this.player2.cooldownEffects],
+                      [this.player1.x,this.player1.y, this.player1.image, this.player1.frameX, this.player1.cooldownEffects,this.player1.health],
+                      [this.player2.x,this.player2.y, this.player2.image, this.player2.frameX, this.player2.cooldownEffects,this.player2.health],
                       []])
 
         break;
