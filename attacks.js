@@ -45,11 +45,21 @@ var sprites = {
   "playerOneBasicAttack":{
     xs:64,
     ys:64,
+
+    hBoxX:10,
+    hBoxY:5,
+    hBoxX2:45,
+    hBoxY2:55,
     frames:7
   },
   "playerTwoBasicAttack":{
     xs:64,
     ys:64,
+
+    hBoxX:5,
+    hBoxY:40,
+    hBoxX2:60,
+    hBoxY2:64,
     frames:8
   }
 }

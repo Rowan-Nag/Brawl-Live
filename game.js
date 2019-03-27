@@ -21,7 +21,8 @@ var keys = {down: 40,
     keysDown = {},
     frameRate = 1/60,
     frameDelay = frameRate*1000,
-    totalMenuButtons = 0
+    totalMenuButtons = 0,
+    boxes = false
 
 
 
@@ -373,19 +374,25 @@ class Attack{
     this.effects = attackData[type].effects; //effects
     this.properties = attackData[type].properties //other properties
     this.cooldown = attackData[type].cooldown // cooldown of attack
+    this.frameX = 64 //sprites[image].xs; width/height of each frame
+    this.frameY = 64 //sprites[image].ys;
+    this.sx = (sprites[image].hBoxX)*size;
+    this.sy = (sprites[image].hBoxY-this.frameY/2)*size;
+    this.sx2 = (sprites[image].hBoxX2)*size;
+    this.sy2 = (sprites[image].hBoxY2-this.frameY/2)*size;
     this.currentFrame = 0; //current frame of animation
     this.image = image
     this.totalFrames = sprites[image].frames; //total frames of the animation
-    this.frameX = 64 //sprites[image].xs; width/height of each frame
-    this.frameY = 64 //sprites[image].ys;
+
     this.loop = //sprites[image].loop;
     this.ticksPerFrame = this.frames/this.totalFrames;
     this.player = player
     this.hitPlayers = [];
-    this.tr = {x:this.x+this.frameX*this.size,y:this.y-this.frameY*this.size/2}
-    this.tl = {x:this.x,y:this.y-this.frameY*this.size/2}
-    this.bl = {x:this.x,y:this.y+this.frameY*this.size/2}
-    this.br = {x:this.x+this.frameX*this.size,y:this.y+this.frameY*this.size/2}
+
+    this.tr = {x:this.x+this.sx2,y:this.y+this.sy}
+    this.tl = {x:this.x+this.sx,y:this.y+this.sy}
+    this.bl = {x:this.x+this.sx,y:this.y+this.sy2}
+    this.br = {x:this.x+this.sx2,y:this.y+this.sy2}
 
     this.tr = rotateCorner(this.player.x+this.player.width/2, this.player.y+this.player.height/2,this.tr, this.rotation)
     this.tl = rotateCorner(this.player.x+this.player.width/2, this.player.y+this.player.height/2,this.tl, this.rotation)
@@ -408,18 +415,24 @@ class Attack{
     ctx.rotate(this.rotation)
     ctx.translate(-x,-y)
     ctx.drawImage(document.getElementById(this.image), this.frameX*this.currentFrame, 0, this.frameX, this.frameY, x-this.size*this.frameX/2,y-this.size*this.frameY, this.frameX*this.size, this.frameY*this.size)
-    //ctx.strokeRect(x-this.size*this.frameX/2,y-this.frameY*this.size,this.frameX*this.size,this.frameY*this.size)
-    //ctx.stroke();
+    ctx.beginPath();
+    if(boxes){
+    ctx.strokeRect(x-this.size*this.frameX/2,y-this.frameY*this.size,this.frameX*this.size,this.frameY*this.size)
+    ctx.stroke();
+  }
     ctx.restore();
-    /*
-    ctx.strokeStyle = "#00000";
+    ctx.save();
+    if(boxes){
+    ctx.strokeStyle = "#FF0000";
     ctx.beginPath();
     ctx.moveTo(this.tr.x, this.tr.y);
     ctx.lineTo(this.tl.x, this.tl.y);
     ctx.lineTo(this.bl.x, this.bl.y);
     ctx.lineTo(this.br.x, this.br.y);
+    ctx.lineTo(this.tr.x, this.tr.y);
     ctx.stroke();
-    */
+    ctx.restore();
+  }
   }
   incrementFrame(){
     this.currentFrame += 1;
@@ -483,6 +496,11 @@ class Player{
     ctx.drawImage(document.getElementById(this.image),32*this.frameX, 0, 32, 42, x, y, this.width, this.height);
     ctx.globalAlpha = 1
     this.drawHealth(x, y-20)
+    if(boxes){
+      ctx.beginPath();
+      ctx.strokeRect(this.x,this.y,this.width,this.height);
+      ctx.stroke();
+    }
   }
   incrementFrame(numFrames) {
     this.frameX += 1
