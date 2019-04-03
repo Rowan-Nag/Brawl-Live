@@ -120,13 +120,13 @@ peer.on('connection', function(conn){
       game.player2.x = data[1][0];
       game.player2.y = data[1][1];
       game.player2.image = data[1][2];
-      game.player2.health = data[1][3];
+      game.player2.health = data[1][5];
       game.player2.cooldownEffects = data[1][4];
 
       game.player1.x = data[2][0];
       game.player1.y = data[2][1];
       game.player1.image = data[2][2];
-      game.player1.health = data[2][3]
+      game.player1.health = data[2][5]
       game.player1.cooldownEffects = data[2][4];
       break;
     case 6:
@@ -222,6 +222,18 @@ function rotateCorner(cx, cy, corner, rotation){
   let rtdY = tempX*Math.sin(-tempR) + tempY*Math.cos(tempR);
 
   return({x:rtdX+cx,y:-rtdY+cy})
+
+}
+
+function moveCorners(c1, c2, c3, c4, x, y){
+  c1.x += x;
+  c1.y += y;
+  c2.x += x;
+  c2.y += y;
+  c3.x += x;
+  c3.y += y;
+  c4.x += x;
+  c4.y += y;
 
 }
 
@@ -445,6 +457,14 @@ class Attack{
     }
   }
 }
+
+class Movement{
+  constructor(type, speed){
+    this.type = type;
+    this.speed = speed;
+  }
+}
+
 class Player{
   constructor(num){
     this.num = num
@@ -641,9 +661,11 @@ class Player{
   }
     if(!hCollision){
       this.x += dx;
+      moveCorners(this.tr, this.br, this.tl, this.bl, dx, 0)
     }
     if(!vCollision){
       this.y += dy;
+      moveCorners(this.tr, this.br, this.tl, this.bl, 0, dy)
     }
 
     if(this.x < 0){
@@ -983,10 +1005,10 @@ class Game{
         if(this.player2.cooldownEffects.moveLock<=0){
           this.player2.move(this.p2Keys)
         }
-
+        this.attackCollision()
         this.drawMap(this.map);
         this.drawMap(this.mapAdds);
-        this.drawMap(this.mapCollision)
+
         this.drawSprites();
         //this.player1.basicAttack();
         mainConn.send([5,
