@@ -1038,7 +1038,8 @@ class Game{
         break;
       case 1: //hosting
         this.player1.mouseAngle(keysDown);
-
+        game.player1.useMovements();
+        game.player2.useMovements();
         if(this.player1.cooldownEffects.moveLock<=0){
           this.player1.move(keysDown);
         }
@@ -1068,6 +1069,7 @@ class Game{
         break;
       case 3: //singlePlayer
         this.player1.mouseAngle(keysDown);
+        this.player1.useMovements();
         if(this.player1.cooldownEffects.moveLock<=0){
           this.player1.move(keysDown);
         }
@@ -1099,8 +1101,7 @@ function updateTicks(){
   game.player1.reduceCooldowns();
   game.player2.reduceCooldowns();
 
-  game.player1.useMovements();
-  game.player2.useMovements();
+
   if(game.player1.walking && ticks%4 <1){
     game.player1.incrementFrame(2)
   }
