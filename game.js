@@ -17,7 +17,8 @@ var keys = {down: 40,
             w: 87,
             e: 69,
             r: 82,
-            space:32,},
+            space:32,
+            shift:16},
     keysDown = {},
     frameRate = 1/60,
     frameDelay = frameRate*1000,
@@ -459,9 +460,27 @@ class Attack{
 }
 
 class Movement{
-  constructor(type, speed){
-    this.type = type;
-    this.speed = speed;
+  constructor(startLag, endLag, frames, distance,  player){
+    this.player = player;
+    console.log(player)
+    this.startLag = startLag;
+    this.endLag = endLag;
+    this.frames = frames;
+    this.distance = distance;
+    this.angle = -this.player.mouseAngle({})-Math.PI/2
+    this.frame = 0;
+    this.moveFrames = frames-endLag-startLag
+    console.log(this.moveFrames)
+  }
+  move(){
+    //console.log(this.frame, this.frame > this.startLag, this.frame < tthis.endLag)
+    if(this.frame > this.startLag && this.frame < this.frames-this.endLag){
+      console.log(this.player.x,this.player.y)
+      this.player.moveX(Math.cos(this.angle)*this.distance/this.moveFrames)
+      console.log(Math.cos(this.angle), this.distance, this.moveFrames)
+      this.player.moveY(Math.sin(this.angle)*this.distance/this.moveFrames)
+    }
+    this.frame++
   }
 }
 
@@ -481,6 +500,7 @@ class Player{
     this.height = 42;
     this.frameX = 0;
     this.activeAttacks = [];
+    this.movements = [];
     this.walking = false
     this.downImg=playerData.images[num].down
     this.upImg=playerData.images[num].up
@@ -505,6 +525,7 @@ class Player{
     this.cooldownEffects = {"moveLock":0,"autoCd":0, "rolling":0, "invulnerability":0}
     this.effects = {}
     this.cooldowns = ["moveLock", "autoCd", "rolling", "invulnerability"]
+
   }
 
   draw(x, y){
@@ -580,7 +601,45 @@ class Player{
 
 	 this.angle = Math.atan2(this.x+this.width/2 - mouseX, this.y+this.height/2 - mouseY)
    keyList["mouseAngle"] = this.angle
+   return this.angle
+  }
+  moveX(x){
+    let noCollision = true;
+    for(let i = 0; i <game.mapCollision.length; i++){
+      if(collision({x:this.x+x,y:this.y,width:this.width,height:this.height}, game.mapCollision[i])){
+        console.log("collide")
+        noCollision = false
+      }
+    }
+    if(noCollision){
+      this.x+=x
+      moveCorners(this.tr, this.br, this.tl, this.bl, x, 0)
+    }
+  }
+  moveY(y){
+    let noCollision = true;
+    for(let i = 0; i <game.mapCollision.length; i++){
+      if(collision({x:this.x,y:this.y+y,width:this.width,height:this.height}, game.mapCollision[i])){
+        console.log("collide")
+        noCollision = false
+      }
+    }
+    if(noCollision){
+      this.y+=y
+      moveCorners(this.tr, this.br, this.tl, this.bl, 0, y)
+    }
 
+  }
+
+  useMovements(){
+
+    for(let i = 0; i < this.movements.length; i++){
+      this.movements[i].move()
+      if(this.movements[i].frame >= this.movements[i].frames){
+        this.movements.splice(i,1)
+        i -=1
+      }
+    }
   }
 
   move(keyList){
@@ -600,7 +659,10 @@ class Player{
 
     }
 
-
+    if(keys.shift in keyList){
+      this.movements.push(playerAttacks[this.num].roll(this))
+      this.cooldownEffects["moveLock"] = this.movements[this.movements.length-1].frames
+    }
 
     if(keys.a in keyList){
       dx -= 1
@@ -638,41 +700,17 @@ class Player{
 
     }
 
-    for(let i = 0; i <game.mapCollision.length; i++){
-      if(collision({x:this.x+dx,y:this.y,width:this.width,height:this.height}, game.mapCollision[i])){
-          hCollision = true;
+    this.moveX(dx)
+    this.moveY(dy)
 
-          //this.x = game.mapCollision[i].x+game.mapCollision[i].width+5;}
-      }
-      if(collision({x:this.x,y:this.y+dy,width:this.width,height:this.height}, game.mapCollision[i])){
-          vCollision = true;
-
-        /*if(dy < 0){
-          this.y = game.mapCollision[i].y+game.mapCollision[i].height+5;}
-        if(dy > 0){
-          this.y = game.mapCollision[i].y-this.height-5}
-        console.log('collide vertically')*/
-      }
-      if(!vCollision && !hCollision){if(collision({x:this.x+dx,y:this.y+dy,width:this.width,height:this.height}, game.mapCollision[i])){
-          hCollision = true;
-          vCollision = true;
-        }
-    }
-  }
-    if(!hCollision){
-      this.x += dx;
-      moveCorners(this.tr, this.br, this.tl, this.bl, dx, 0)
-    }
-    if(!vCollision){
-      this.y += dy;
-      moveCorners(this.tr, this.br, this.tl, this.bl, 0, dy)
-    }
 
     if(this.x < 0){
       this.x = 0
+      console.log("resetX")
     }
     if(this.y < 0){
       this.y = 0
+      console.log("resetY")
     }
 
     if(this.y > (game.map[0].length-1)*game.tileSize){
@@ -799,6 +837,7 @@ class Game{
   }
 
   attackCollision(){
+
     for(let i = 0; i < this.attacks.length; i++){
 
       if(this.attacks[i].player == this.player1 && this.player2.cooldownEffects.invulnerability < 0){
@@ -999,6 +1038,7 @@ class Game{
         break;
       case 1: //hosting
         this.player1.mouseAngle(keysDown);
+
         if(this.player1.cooldownEffects.moveLock<=0){
           this.player1.move(keysDown);
         }
@@ -1031,6 +1071,7 @@ class Game{
         if(this.player1.cooldownEffects.moveLock<=0){
           this.player1.move(keysDown);
         }
+
         this.attackCollision();
         this.drawMap(this.map);
         this.drawMap(this.mapAdds);
@@ -1057,6 +1098,9 @@ function updateTicks(){
   ticks += 1
   game.player1.reduceCooldowns();
   game.player2.reduceCooldowns();
+
+  game.player1.useMovements();
+  game.player2.useMovements();
   if(game.player1.walking && ticks%4 <1){
     game.player1.incrementFrame(2)
   }

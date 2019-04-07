@@ -1,18 +1,17 @@
 var playerAttacks = {
   //x, y, attackImg, size scale, frames (speed of attack), attack template
   1:{
-    auto:function(x, y, rotation, player){return new Attack(x, y,rotation, "playerOneBasicAttack", 1.3, 1, "melee1", player)}
-
+    auto:function(x, y, rotation, player){return new Attack(x, y,rotation, "playerOneBasicAttack", 1.3, 1, "melee1", player)},
+    roll:function(player){return new Movement(2, 4, 18, 100, player)}
 
   },
   2:{
     auto:function(x, y, rotation, player){return new Attack(x, y,rotation, "playerTwoBasicAttack", 1.3, 1, "melee1", player)},
-    roll:function(x, y, rotation, player){player.effects["rolling"]}
+    roll:function(player){return new Movement(5, 20, 40, 20, player)}
 
   },
 
 }
-
 
 var attackData = {
   //20 ticks = 1 second
