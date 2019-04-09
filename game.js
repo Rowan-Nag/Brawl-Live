@@ -472,13 +472,42 @@ class Movement{
     this.moveFrames = frames-endLag-startLag
     console.log(this.moveFrames)
   }
+  draw(){
+    console.log(1)
+    if(this.frame < this.startLag){
+      console.log(2)
+      ctx.save();
+      ctx.strokeStyle = "#41dbdb";
+      ctx.lineWidth = 7
+      ctx.beginPath();
+      ctx.arc(this.player.x+this.player.width/2, this.player.y+this.player.height/2, 25*(this.startLag-this.frame)/this.startLag, 0, 2 * Math.PI);
+      ctx.stroke();
+      ctx.restore()
+    }
+    else if(this.frame > this.startLag + this.moveFrames){
+      console.log(3)
+      ctx.save();
+      ctx.strokeStyle = "#FFaadb";
+      ctx.lineWidth = 5
+      ctx.beginPath();
+      ctx.arc(this.player.x+this.player.width/2, this.player.y+this.player.height/2, 20*this.endLag/(this.frames-this.frame)/this.endLag, 0, 2 * Math.PI);
+      ctx.stroke();
+      ctx.restore()
+    }
+  }
   move(){
     //console.log(this.frame, this.frame > this.startLag, this.frame < tthis.endLag)
+    if(this.frame == this.startLag && this.player.cooldownEffects["invulnerability"] < this.moveFrames){
+      this.player.cooldownEffects["invulnerability"] = this.moveFrames
+    }
     if(this.frame > this.startLag && this.frame < this.frames-this.endLag){
       console.log(this.player.x,this.player.y)
       this.player.moveX(Math.cos(this.angle)*this.distance/this.moveFrames)
       console.log(Math.cos(this.angle), this.distance, this.moveFrames)
       this.player.moveY(Math.sin(this.angle)*this.distance/this.moveFrames)
+    }
+    else{
+
     }
     this.frame++
   }
@@ -541,7 +570,11 @@ class Player{
       ctx.beginPath();
       ctx.strokeRect(this.x,this.y,this.width,this.height);
       ctx.stroke();
+      for(let i = 0; i < this.movements.length; i++){
+        this.movements[i].draw()
+      }
     }
+
   }
   incrementFrame(numFrames) {
     this.frameX += 1
@@ -1117,5 +1150,5 @@ function updateTicks(){
   }
 }
 
-var tickCount = setInterval(updateTicks, 50)
+var tickCount = setInterval(updateTicks, 50) //50 = 20 times per second (1000/50)
 requestInterval(update, frameDelay)

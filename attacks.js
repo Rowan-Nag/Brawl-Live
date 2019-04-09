@@ -2,12 +2,12 @@ var playerAttacks = {
   //x, y, attackImg, size scale, frames (speed of attack), attack template
   1:{
     auto:function(x, y, rotation, player){return new Attack(x, y,rotation, "playerOneBasicAttack", 1.3, 1, "melee1", player)},
-    roll:function(player){return new Movement(2, 4, 18, 100, player)}
+    roll:function(player){return new Movement(2, 3, 14, 120, player)}
 
   },
   2:{
     auto:function(x, y, rotation, player){return new Attack(x, y,rotation, "playerTwoBasicAttack", 1.3, 1, "melee1", player)},
-    roll:function(player){return new Movement(5, 20, 40, 20, player)}
+    roll:function(player){return new Movement(8, 6, 17, 100, player)}
 
   },
 
