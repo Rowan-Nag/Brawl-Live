@@ -416,8 +416,12 @@ class Attack{
 
   move(){
     if(this.speed > 0){
-      this.x += this.speed*Math.cos(this.rotation);
-      this.y += this.speed*Math.sin(this.rotation);
+      let dx = this.speed*Math.cos(this.rotation);
+      let dy = this.speed*Math.sin(this.rotation);
+      moveCorners(this.tr, this.tl, this.bl, this.br, dx, dy)
+      this.x += dx
+      this.y += dy
+
     }
   }
   draw(x, y){
