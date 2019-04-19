@@ -474,12 +474,12 @@ class Movement{
     this.angle = -this.player.mouseAngle({})-Math.PI/2
     this.frame = 0;
     this.moveFrames = frames-endLag-startLag
-    console.log(this.moveFrames)
+    \
   }
   draw(){
-    console.log(1)
+
     if(this.frame < this.startLag){
-      console.log(2)
+
       ctx.save();
       ctx.strokeStyle = "#41dbdb";
       ctx.lineWidth = 7
@@ -505,9 +505,9 @@ class Movement{
       this.player.cooldownEffects["invulnerability"] = this.moveFrames
     }
     if(this.frame > this.startLag && this.frame < this.frames-this.endLag){
-      console.log(this.player.x,this.player.y)
+
       this.player.moveX(Math.cos(this.angle)*this.distance/this.moveFrames)
-      console.log(Math.cos(this.angle), this.distance, this.moveFrames)
+
       this.player.moveY(Math.sin(this.angle)*this.distance/this.moveFrames)
     }
     else{
@@ -652,6 +652,17 @@ class Player{
       this.x+=x
       moveCorners(this.tr, this.br, this.tl, this.bl, x, 0)
     }
+    if(this.x < 0){
+      this.x = 0
+      console.log("resetX")
+    }
+    if(this.x > (game.map.length-1)*game.tileSize){
+      this.x = (game.map.length-1)*game.tileSize
+    }
+    if(this.x > WIDTH/2 && this.x < game.tileSize*game.map.length-WIDTH/2){
+      game.cameraX = this.x
+    }
+
   }
   moveY(y){
     let noCollision = true;
@@ -664,8 +675,20 @@ class Player{
     if(noCollision){
       this.y+=y
       moveCorners(this.tr, this.br, this.tl, this.bl, 0, y)
+
+    }
+    if(this.y < 0){
+      this.y = 0
+      console.log("resetY")
     }
 
+    if(this.y > (game.map[0].length-1)*game.tileSize){
+
+      this.y = (game.map[0].length-1)*game.tileSize
+    }
+    if(this.y > HEIGHT/2 && this.y < game.tileSize*game.map[0].length-HEIGHT/2){
+      game.cameraY = this.y
+    }
   }
 
   useMovements(){
@@ -741,29 +764,12 @@ class Player{
     this.moveY(dy)
 
 
-    if(this.x < 0){
-      this.x = 0
-      console.log("resetX")
-    }
-    if(this.y < 0){
-      this.y = 0
-      console.log("resetY")
+
     }
 
-    if(this.y > (game.map[0].length-1)*game.tileSize){
 
-      this.y = (game.map[0].length-1)*game.tileSize
-    }
-    if(this.x > (game.map.length-1)*game.tileSize){
-      this.x = (game.map.length-1)*game.tileSize
-    }
 
-    if(this.x > WIDTH/2 && this.x < game.tileSize*game.map.length-WIDTH/2){
-      game.cameraX = this.x
-    }
-    if(this.y > HEIGHT/2 && this.y < game.tileSize*game.map[0].length-HEIGHT/2){
-      game.cameraY = this.y
-    }
+
   }
 
   applyEffects(effectList){
