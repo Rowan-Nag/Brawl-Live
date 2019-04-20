@@ -474,7 +474,7 @@ class Movement{
     this.angle = -this.player.mouseAngle({})-Math.PI/2
     this.frame = 0;
     this.moveFrames = frames-endLag-startLag
-    \
+    
   }
   draw(){
 
