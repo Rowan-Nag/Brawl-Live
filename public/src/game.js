@@ -26,7 +26,7 @@ var keys = {down: 40,
     boxes = false
 
 
-
+console.log(1)
 window.addEventListener('mousemove', initiatePos, false);
 
 function initiatePos(e) {
@@ -474,7 +474,7 @@ class Movement{
     this.angle = -this.player.mouseAngle({})-Math.PI/2
     this.frame = 0;
     this.moveFrames = frames-endLag-startLag
-    
+
   }
   draw(){
 
@@ -770,7 +770,7 @@ class Player{
 
 
 
-  }
+  
 
   applyEffects(effectList){
     for(let i = 0; i< effectList.length; i++){
