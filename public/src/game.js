@@ -27,7 +27,7 @@ var keys = {down: 40,
     ticks = 0
 
 
-
+console.log(1)
 window.addEventListener('mousemove', initiatePos, false);
 
 function initiatePos(e) {
