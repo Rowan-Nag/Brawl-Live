@@ -3,7 +3,7 @@ ctx = canvas.getContext('2d');
 WIDTH = canvas.width;
 HEIGHT = canvas.height;
 ctx.fillRect(0,0,WIDTH,HEIGHT)
-var ticks = 0;
+
 ctx.imageSmoothingEnabled = false;
 var keys = {down: 40,
             up: 38,
@@ -23,7 +23,8 @@ var keys = {down: 40,
     frameRate = 1/60,
     frameDelay = frameRate*1000,
     totalMenuButtons = 0,
-    boxes = false
+    boxes = false,
+    ticks = 0
 
 
 
@@ -474,12 +475,12 @@ class Movement{
     this.angle = -this.player.mouseAngle({})-Math.PI/2
     this.frame = 0;
     this.moveFrames = frames-endLag-startLag
-    \
+    console.log(this.moveFrames)
   }
   draw(){
-
+    console.log(1)
     if(this.frame < this.startLag){
-
+      console.log(2)
       ctx.save();
       ctx.strokeStyle = "#41dbdb";
       ctx.lineWidth = 7
@@ -505,9 +506,9 @@ class Movement{
       this.player.cooldownEffects["invulnerability"] = this.moveFrames
     }
     if(this.frame > this.startLag && this.frame < this.frames-this.endLag){
-
+      console.log(this.player.x,this.player.y)
       this.player.moveX(Math.cos(this.angle)*this.distance/this.moveFrames)
-
+      console.log(Math.cos(this.angle), this.distance, this.moveFrames)
       this.player.moveY(Math.sin(this.angle)*this.distance/this.moveFrames)
     }
     else{
@@ -659,10 +660,6 @@ class Player{
     if(this.x > (game.map.length-1)*game.tileSize){
       this.x = (game.map.length-1)*game.tileSize
     }
-    if(this.x > WIDTH/2 && this.x < game.tileSize*game.map.length-WIDTH/2){
-      game.cameraX = this.x
-    }
-
   }
   moveY(y){
     let noCollision = true;
@@ -675,7 +672,6 @@ class Player{
     if(noCollision){
       this.y+=y
       moveCorners(this.tr, this.br, this.tl, this.bl, 0, y)
-
     }
     if(this.y < 0){
       this.y = 0
@@ -685,9 +681,6 @@ class Player{
     if(this.y > (game.map[0].length-1)*game.tileSize){
 
       this.y = (game.map[0].length-1)*game.tileSize
-    }
-    if(this.y > HEIGHT/2 && this.y < game.tileSize*game.map[0].length-HEIGHT/2){
-      game.cameraY = this.y
     }
   }
 
@@ -762,14 +755,14 @@ class Player{
 
     this.moveX(dx)
     this.moveY(dy)
+    
 
-
-
+    if(this.x > WIDTH/2 && this.x < game.tileSize*game.map.length-WIDTH/2){
+      game.cameraX = this.x
     }
-
-
-
-
+    if(this.y > HEIGHT/2 && this.y < game.tileSize*game.map[0].length-HEIGHT/2){
+      game.cameraY = this.y
+    }
   }
 
   applyEffects(effectList){
