@@ -1,10 +1,11 @@
 var config = {
-   apiKey: "AIzaSyBdfcvDs20C83am7k39wk6yK1VADvixnCc",
-   authDomain: "brawl-live.firebaseapp.com",
-   databaseURL: "https://brawl-live.firebaseio.com",
-   storageBucket: "bucket.appspot.com",
-   messagingSenderId: "473229450954",
-   appId: "1:473229450954:web:eb3ed9c72c724794"
+  apiKey: "AIzaSyBdfcvDs20C83am7k39wk6yK1VADvixnCc",
+  authDomain: "brawl-live.firebaseapp.com",
+  databaseURL: "https://brawl-live.firebaseio.com",
+  projectId: "brawl-live",
+  storageBucket: "brawl-live.appspot.com",
+  messagingSenderId: "473229450954",
+  appId: "1:473229450954:web:cfc6f24208493369"
 };
 firebase.initializeApp(config);
 var server = null
