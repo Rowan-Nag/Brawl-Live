@@ -26,6 +26,7 @@ function createServer(serverId, mapId, player1) {
     "playerCount":1,
 
   });
+  
 }
 function setServer(serverId){
   //set the server variable
