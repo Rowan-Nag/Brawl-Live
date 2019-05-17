@@ -15,5 +15,9 @@
   "bugs": {
     "url": "https://github.com/Rowan-Nag/Brawl-Live/issues"
   },
-  "homepage": "https://github.com/Rowan-Nag/Brawl-Live#readme"
+  "homepage": "https://github.com/Rowan-Nag/Brawl-Live#readme",
+  "dependencies": {
+    "angular": "^1.7.8",
+    "build": "^0.1.4"
+  }
 }

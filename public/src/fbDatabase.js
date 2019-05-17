@@ -26,7 +26,7 @@ function createServer(serverId, mapId, player1) {
     "playerCount":1,
 
   });
-  
+
 }
 function setServer(serverId){
   //set the server variable
@@ -39,7 +39,7 @@ function setServer(serverId){
 */
 
 
-
+/*
 function joinServer(serverId){
-  firebase.database().ref('servers/'+serverId+'/players').set){}
-}
+  firebase.database().ref('servers/'+serverId+'/players').set{}
+}*/
