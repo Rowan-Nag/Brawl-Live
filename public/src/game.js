@@ -755,7 +755,7 @@ class Player{
 
     this.moveX(dx)
     this.moveY(dy)
-    
+
 
     if(this.x > WIDTH/2 && this.x < game.tileSize*game.map.length-WIDTH/2){
       game.cameraX = this.x
@@ -1012,9 +1012,9 @@ class Game{
       this.attacks[i].draw(this.attacks[i].x-this.cameraX+WIDTH/2,this.attacks[i].y-this.cameraY+HEIGHT/2);
       if(this.attacks[i].currentFrame==this.attacks[i].totalFrames){
         if(hosting){
-        this.attacks[i].player.activeAttacks.splice(i,1)
+        this.attacks[i].player.activeAttacks.splice(i,1);
         }
-        this.attacks.splice(i, 1)
+        this.attacks.splice(i, 1);
         i -= 1
       }
     }

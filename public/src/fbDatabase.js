@@ -21,7 +21,7 @@ function createServer(serverId, mapId, player1) {
     },
 
     "players": {
-      "player1": player1
+      "placeholder":"placeholder",
     },
     "playerCount":1,
 
