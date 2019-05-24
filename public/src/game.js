@@ -520,6 +520,7 @@ class Movement{
 
 class Player{
   constructor(num){
+    this.id = 0
     this.num = num
     this.attacks = {};
     this.basicAttackImg = playerData.images[num].attack
@@ -789,6 +790,8 @@ class Game{
     this.tileSize = 50;
     this.menus = {};
     this.currentMenu = [];
+
+    this.players = []
   }
   setup(){
     //this.genNewMap(10, 10);
@@ -800,7 +803,12 @@ class Game{
     this.switchMenu(this.currentMenu);
 
   }
-
+  serverSetup(server){
+    this.players = server.players;
+    this.map = server.tiles;
+    this.mapAdds = server.mapAdds;
+    this.mapCollision = server.collisionMap;
+  }
   genMenus(){
     //x, y, width, height, text, func, font, size
     this.menus ={
