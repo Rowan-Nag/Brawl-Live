@@ -1047,12 +1047,13 @@ class Game{
     for(let i = 0; i < this.sprites.length; i++){
       this.sprites[i].draw();
     }
-    for(let i = 0; i < this.players; i++){
+    for(let i = 0; i < this.players.length; i++){
+      
       this.players[i].draw(this.players[i].x-this.cameraX+WIDTH/2, this.players[i].y-this.cameraY+HEIGHT/2)
     }
   }
   
-
+  
   switchMenu(target){
     for(let i = 0; i < this.currentMenu.length; i++){
       this.currentMenu[i].deactivate();
@@ -1089,7 +1090,7 @@ class Game{
   this.state = target/1;
 }
 
-
+  
 
   stateEngine(){
 
@@ -1150,15 +1151,15 @@ class Game{
         this.drawSprites();
         //this.player1.basicAttack();
       case 4: //FB hosting
-      
+        server.players[server.playerId] = game.players[server.playerId]
         this.players = server.players
-        //this.players[server.playerId].mouseAngle(keysDown);
+        this.players[server.playerId].mouseAngle(keysDown);
         this.players[server.playerId].useMovements();
         if(this.players[server.playerId].cooldownEffects.moveLock<=0){
           this.players[server.playerId].move(keysDown);
         } 
         
-        console.log(this.players)
+        //updatePlayer()
         this.drawMap(this.map);
         this.drawMap(this.mapAdds);
         this.drawSprites();

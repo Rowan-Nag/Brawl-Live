@@ -20,9 +20,7 @@ function createServer(serverId, mapId) {
       "mapCollision" :MAPS[mapId].collision,
     },
     "serverId": serverId,
-    "players": {
-      "placeholder": "placeholder"
-    }
+    "players": {}
 
 
   });
@@ -45,14 +43,21 @@ function setServer(serverId){
     //console.log(snapshot.val(), 2)
     server.setMap(snapshot.val()["map"]["mapId"])
     //console.log(snapshot)
+    console.log(snapshot.val()["players"])
+    
     for(let i = 0; i < snapshot.val()["players"].length; i++){
-      server.players.push(snapshot.val()["players"][i])
+      let tempPlayer = new Player(1)
+      server.players.push(tempPlayer)
+      console.log("server.players")
+      //snapshot.val()["players"][i]
     }
   });
   var playerRef = firebase.database().ref('servers/' + serverId + "/players")
 
   playerRef.on('child_changed', function(data) {
-    let newPlayer = data.val();
+    console.log("changed")
+    //use forEach() for this! ---important---
+    let newPlayer = data.val()["playerName"];
     let changedPlayer = server.players[data.val().id];
     changedPlayer.x = newPlayer.x;
     changedPlayer.y = newPlayer.y;
@@ -60,6 +65,7 @@ function setServer(serverId){
     changedPlayer.frameX = newPlayer.frameX;
     changedPlayer.cooldownEffects = newPlayer.cooldownEffects;
     changedPlayer.health = newPlayer.health;
+    console.log('CHANGED')
   });
   playerRef.on('child_removed', function(data){
     console.log('player removed')
@@ -67,22 +73,30 @@ function setServer(serverId){
   });
   playerRef.on('child_added', function(data){
     console.log('player added')
-    tempPlayer = new Player();
-    server.players.push(data.val())
+    tempPlayer = new Player(1);
+    server.players.push(tempPlayer)
   })
  //console.log(server, 'setServer() - 2')
 
 }
 function updatePlayer(){
-
+  firebase.database().ref('servers/'+server.serverId+'/players'+server.playerKey).update({
+    "playerName":{
+      x:server.players[server.playerId].x,
+      y:server.players[server.playerId].y
+    }
+  })
 }
 
 function joinServer(serverId){
+  
   setServer(serverId);
+  mid.innerHTML = "connected to: " + serverId
   //console.log(server, 'joinServer()')
-  let name = "p"+server.players.length
+  //let defName = "p"+server.players.length.toString()
+  
+  server.playerKey = firebase.database().ref('servers/'+serverId+'/players').push({
+      "playerName": new Player(1)
+  }).key
   server.playerId = server.players.length-1
-  firebase.database().ref('servers/'+serverId+'/players').set({
-    name:game.player1
-  })
 }

@@ -7,7 +7,7 @@ class Server{
     this.mapAdds = MAPS[mapId].adds;
     this.collisionMap = MAPS[mapId].collision;
     this.playerId = 0;
-
+    this.playerKey = 0;
   }
   setMap(mapId){
     this.mapId = mapId;
@@ -15,4 +15,5 @@ class Server{
     this.mapAdds = MAPS[mapId].adds;
     this.collisionMap = MAPS[mapId].collision;
   }
+  
 }
