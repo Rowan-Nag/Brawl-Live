@@ -6,6 +6,7 @@ class Server{
     this.tiles = MAPS[mapId].tiles;
     this.mapAdds = MAPS[mapId].adds;
     this.collisionMap = MAPS[mapId].collision;
+    this.playerId = 0;
 
   }
   setMap(mapId){

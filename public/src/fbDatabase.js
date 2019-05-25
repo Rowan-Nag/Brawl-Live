@@ -62,9 +62,12 @@ function setServer(serverId){
     changedPlayer.health = newPlayer.health;
   });
   playerRef.on('child_removed', function(data){
+    console.log('player removed')
     server.players.splice(data.val().id, 1)
   });
   playerRef.on('child_added', function(data){
+    console.log('player added')
+    tempPlayer = new Player();
     server.players.push(data.val())
   })
  //console.log(server, 'setServer() - 2')
@@ -78,6 +81,7 @@ function joinServer(serverId){
   setServer(serverId);
   //console.log(server, 'joinServer()')
   let name = "p"+server.players.length
+  server.playerId = server.players.length-1
   firebase.database().ref('servers/'+serverId+'/players').set({
     name:game.player1
   })

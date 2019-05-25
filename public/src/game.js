@@ -252,8 +252,26 @@ function addText(string, x, y, size, color){
 function hostButton(){
     hosting = true
     console.log('HOSTING')
+    document.getElementById("peerId").style.visibility = "visible";
     mid.innerHTML = "Your ID: " + peerId.toString();
     game.switchMenu(game.menus.host)
+
+}
+
+function createServerButton(){ ////////////////////////////////////////////////////////////////////////////////////////////
+  sID = document.getElementById('peerId').value;
+  if(sID.length > 3){
+    createServer(sID, 1)
+    game.switchState(4)
+  }
+}
+
+function joinServerButton(){
+  sID = document.getElementById('peerId').value;
+  if(sID.length > 3){
+    joinServer(sID)
+    game.switchState(4)
+  }
 }
 
 function joinButton(){
@@ -821,11 +839,11 @@ class Game{
 	    howToPlay:[new menuButton(WIDTH/2-100, HEIGHT*1/2-200, 200, 50, 'Back', function(){game.switchMenu(game.menus.main)}, 'arial', 15),
 				],
 
-	    ping:[new menuButton(WIDTH/2-100, HEIGHT*1/2-200, 200, 50, 'Ready?', function(){mainConn.send([1,peerId])}, 'arial', 15)],
+	    ping:[new menuButton(WIDTH/2-100, HEIGHT*1/2-200, 200, 50, 'Ready?', function(){joinServerButton()}, 'arial', 15)],
 
-      host:[new menuButton(WIDTH/2-100, HEIGHT*1/2-425, 200, 50, 'Start Game', function(){startButton()}, 'arial', 15)],
+      host:[new menuButton(WIDTH/2-100, HEIGHT*1/2-425, 200, 50, 'create server', function(){createServerButton()}, 'arial', 15)],
 
-      join:[new menuButton(WIDTH/2-100, HEIGHT*1/2-400, 200, 50, 'Connect', function(){connectButton()}, 'arial', 15)],
+      join:[new menuButton(WIDTH/2-100, HEIGHT*1/2-400, 200, 50, 'Connect', function(){joinServerButton()}, 'arial', 15)],
 
       charSelect:[new menuButton(50,- WIDTH + 100, 200, 50, 'P1', function(){changeChar(1)}, 'arial', 15),
                   new menuButton(50,- WIDTH + 150, 200, 50, 'P2', function(){changeChar(2)}, 'arial', 15),]
@@ -1010,7 +1028,7 @@ class Game{
 
   addAttack(attack){
     this.attacks.push(attack)
-    if(hosting){
+    if(this.state === 1){
     mainConn.send([6, attack.x, attack.y, attack.rotation, attack.image, attack.size, attack.frames, attack.type, undefined])
     }
   }
@@ -1029,11 +1047,11 @@ class Game{
     for(let i = 0; i < this.sprites.length; i++){
       this.sprites[i].draw();
     }
-    this.player1.draw(this.player1.x-this.cameraX+WIDTH/2, this.player1.y-this.cameraY+HEIGHT/2)
-    if(this.player2){
-    this.player2.draw(this.player2.x-this.cameraX+WIDTH/2, this.player2.y-this.cameraY+HEIGHT/2)
+    for(let i = 0; i < this.players; i++){
+      this.players[i].draw(this.players[i].x-this.cameraX+WIDTH/2, this.players[i].y-this.cameraY+HEIGHT/2)
+    }
   }
-  }
+  
 
   switchMenu(target){
     for(let i = 0; i < this.currentMenu.length; i++){
@@ -1100,7 +1118,14 @@ class Game{
                       [this.player1.x,this.player1.y, this.player1.image, this.player1.frameX, this.player1.cooldownEffects,this.player1.health],
                       [this.player2.x,this.player2.y, this.player2.image, this.player2.frameX, this.player2.cooldownEffects,this.player2.health],
                       []])
-
+        if(this.player1.health < 0 || this.player2.health < 0){
+          this.player1.x = 0;
+          this.player1.y = 0;
+          this.player2.x = 0;
+          this.player2.y = 0;
+          this.player1.health = 100;
+          this.player2.health = 100;
+        }
         break;
       case 2://joining
 
@@ -1124,6 +1149,19 @@ class Game{
         //this.drawMap(this.mapCollision)
         this.drawSprites();
         //this.player1.basicAttack();
+      case 4: //FB hosting
+      
+        this.players = server.players
+        //this.players[server.playerId].mouseAngle(keysDown);
+        this.players[server.playerId].useMovements();
+        if(this.players[server.playerId].cooldownEffects.moveLock<=0){
+          this.players[server.playerId].move(keysDown);
+        } 
+        
+        console.log(this.players)
+        this.drawMap(this.map);
+        this.drawMap(this.mapAdds);
+        this.drawSprites();
     }
   }
 
