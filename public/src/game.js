@@ -116,7 +116,7 @@ peer.on('connection', function(conn){
       game.p2Keys = data[1]
       break;
     case 4:
-      this.player2 = new Player(data[1])
+      this.player2 = new Player(data[1],0)
       break;
     case 5:
       game.player2.x = data[1][0];
@@ -268,9 +268,10 @@ function createServerButton(){ /////////////////////////////////////////////////
 
 function joinServerButton(){
   sID = document.getElementById('peerId').value;
+  console.log('joining server ', sID)
   if(sID.length > 3){
     joinServer(sID)
-    game.switchState(4)
+
   }
 }
 
@@ -325,7 +326,7 @@ function singlePlayerButton(){
 
 function changeChar(num){
 
-  game.player1 = new Player(num)
+  game.player1 = new Player(num, 0)
   game.switchMenu(game.menus.main)
 }
 
@@ -372,7 +373,7 @@ class menuButton{
     this.image = document.getElementById('Nbutton')
     this.buttonNum = totalMenuButtons;
     this.button.onclick=func
-    console.log(this.button)
+
     totalMenuButtons++
     this.deactivate();
     document.getElementById('canvasDiv').appendChild(this.button)
@@ -537,8 +538,8 @@ class Movement{
 }
 
 class Player{
-  constructor(num){
-    this.id = 0
+  constructor(num, id){
+    this.id = id
     this.num = num
     this.attacks = {};
     this.basicAttackImg = playerData.images[num].attack
@@ -561,7 +562,7 @@ class Player{
     this.rightImg=playerData.images[num].right
     this.attackImg= playerData.images[num].attack
     this.rotation = 0
-    console.log(this.downImg, 500)
+
     //collision variables
     this.tr= {x:this.x+this.width,y:this.y}
     this.br= {x:this.x+this.width,y:this.y+this.height}
@@ -793,8 +794,8 @@ class Player{
 
 class Game{
   constructor(){
-    this.player1 = new Player(1)
-    this.player2 = new Player(1);
+    this.player1 = new Player(1,0)
+    this.player2 = new Player(1,0);
 
     this.p2Keys = {};
     this.state = 0;
@@ -826,6 +827,7 @@ class Game{
     this.map = server.tiles;
     this.mapAdds = server.mapAdds;
     this.mapCollision = server.collisionMap;
+    this.players = server.players
   }
   genMenus(){
     //x, y, width, height, text, func, font, size
@@ -1048,12 +1050,12 @@ class Game{
       this.sprites[i].draw();
     }
     for(let i = 0; i < this.players.length; i++){
-      
+
       this.players[i].draw(this.players[i].x-this.cameraX+WIDTH/2, this.players[i].y-this.cameraY+HEIGHT/2)
     }
   }
-  
-  
+
+
   switchMenu(target){
     for(let i = 0; i < this.currentMenu.length; i++){
       this.currentMenu[i].deactivate();
@@ -1087,10 +1089,13 @@ class Game{
     }
 
   }
+  if(target == 3){
+    this.players = [this.player1]
+  }
   this.state = target/1;
 }
 
-  
+
 
   stateEngine(){
 
@@ -1150,16 +1155,21 @@ class Game{
         //this.drawMap(this.mapCollision)
         this.drawSprites();
         //this.player1.basicAttack();
+        break;
       case 4: //FB hosting
+
+        if(typeof game.players[server.playerId] !== 'undefined'){
         server.players[server.playerId] = game.players[server.playerId]
+
+      }
         this.players = server.players
         this.players[server.playerId].mouseAngle(keysDown);
         this.players[server.playerId].useMovements();
         if(this.players[server.playerId].cooldownEffects.moveLock<=0){
           this.players[server.playerId].move(keysDown);
-        } 
-        
-        //updatePlayer()
+        }
+
+        updatePlayer()
         this.drawMap(this.map);
         this.drawMap(this.mapAdds);
         this.drawSprites();
