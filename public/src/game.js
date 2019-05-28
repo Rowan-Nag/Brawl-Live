@@ -24,10 +24,10 @@ var keys = {down: 40,
     frameDelay = frameRate*1000,
     totalMenuButtons = 0,
     boxes = false,
-    ticks = 0
+    ticks = 0,
+    server = {playerId:0}
 
 
-console.log(1)
 window.addEventListener('mousemove', initiatePos, false);
 
 function initiatePos(e) {
@@ -253,7 +253,7 @@ function hostButton(){
     hosting = true
     console.log('HOSTING')
     document.getElementById("peerId").style.visibility = "visible";
-    mid.innerHTML = "Your ID: " + peerId.toString();
+    //mid.innerHTML = "Your ID: " + peerId.toString();
     game.switchMenu(game.menus.host)
 
 }
@@ -417,11 +417,11 @@ class Attack{
     this.image = image
     this.totalFrames = sprites[image].frames; //total frames of the animation
 
-    this.loop = //sprites[image].loop;
+    this.loop = false;//sprites[image].loop;
     this.ticksPerFrame = this.frames/this.totalFrames;
     this.player = player
     this.hitPlayers = [];
-
+    this.playerId = player.id
     this.tr = {x:this.x+this.sx2,y:this.y+this.sy}
     this.tl = {x:this.x+this.sx,y:this.y+this.sy}
     this.bl = {x:this.x+this.sx,y:this.y+this.sy2}
@@ -651,8 +651,9 @@ class Player{
   reduceCooldowns(){
 
     for(let i = 0; i < this.cooldowns.length; i++){
-
-      this.cooldownEffects[this.cooldowns[i]] -= 1;
+      if(this.cooldownEffects[this.cooldowns[i]]>-11){
+        this.cooldownEffects[this.cooldowns[i]] -= 1;
+      }
     }
   }
   mouseAngle(keyList){
@@ -723,13 +724,15 @@ class Player{
 
       this.activeAttacks.push(playerAttacks[this.num].auto(this.x+this.width/2,this.y+this.height/2, -keyList["mouseAngle"], this))
 
+      game.localAttacks.push(playerAttacks[this.num].auto(this.x+this.width/2,this.y+this.height/2, -keyList["mouseAngle"], this))
+
       this.cooldownEffects["autoCd"] = this.activeAttacks[this.activeAttacks.length-1].cooldown;
 
       this.cooldownEffects["moveLock"] = this.activeAttacks[this.activeAttacks.length-1].moveLock;
 
       game.addAttack(this.activeAttacks[this.activeAttacks.length-1])
 
-
+      sendAttack(this, "auto", -keyList["mouseAngle"])
     }
 
     if(keys.shift in keyList){
@@ -799,6 +802,7 @@ class Game{
 
     this.p2Keys = {};
     this.state = 0;
+    this.localAttacks = [];
     this.attacks = [];
     this.map = [];
     this.mapAdds = [];
@@ -810,7 +814,7 @@ class Game{
     this.menus = {};
     this.currentMenu = [];
 
-    this.players = []
+    this.players = [this.player1]
   }
   setup(){
     //this.genNewMap(10, 10);
@@ -1039,10 +1043,18 @@ class Game{
     for(let i = 0; i < this.attacks.length; i++){
       this.attacks[i].draw(this.attacks[i].x-this.cameraX+WIDTH/2,this.attacks[i].y-this.cameraY+HEIGHT/2);
       if(this.attacks[i].currentFrame==this.attacks[i].totalFrames){
-        if(hosting){
-        this.attacks[i].player.activeAttacks.splice(i,1);
-        }
+        //if(hosting){
+        //this.attacks[i].player.activeAttacks.splice(i,1);
+        //}
         this.attacks.splice(i, 1);
+        i -= 1
+      }
+    }
+    for(let i = 0; i <this.localAttacks.length; i++){
+      
+      if(this.localAttacks[i].currentFrame == this.localAttacks[i].totalFrames){
+        this.localAttacks.splice(i,1);
+        this.players[server.playerId].activeAttacks.splice(i,1)
         i -= 1
       }
     }
@@ -1054,7 +1066,6 @@ class Game{
       this.players[i].draw(this.players[i].x-this.cameraX+WIDTH/2, this.players[i].y-this.cameraY+HEIGHT/2)
     }
   }
-
 
   switchMenu(target){
     for(let i = 0; i < this.currentMenu.length; i++){
@@ -1090,12 +1101,10 @@ class Game{
 
   }
   if(target == 3){
-    this.players = [this.player1]
+    this.players = [this.player1, this.player2]
   }
   this.state = target/1;
 }
-
-
 
   stateEngine(){
 
@@ -1189,9 +1198,10 @@ function update(){
 }
 
 function updateTicks(){
+  let localPlayer = game.players[server.playerId]
 
   ticks += 1
-  game.player1.reduceCooldowns();
+  /*game.player1.reduceCooldowns();
   game.player2.reduceCooldowns();
 
 
@@ -1201,11 +1211,17 @@ function updateTicks(){
   if(game.player2.walking && ticks%4 <1){
     game.player2.incrementFrame(2)
   }
+
+  */
+
+
+  localPlayer.reduceCooldowns();
+  if(localPlayer.walking && ticks%4<1){
+    localPlayer.incrementFrame(2)
+  }
   for(let i = 0; i < game.attacks.length; i++){
     if(ticks%game.attacks[i].ticksPerFrame<1){
       game.attacks[i].incrementFrame()
-    }else{
-
     }
   }
 }

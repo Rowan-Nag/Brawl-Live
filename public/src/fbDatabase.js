@@ -21,7 +21,10 @@ function createServer(serverId, mapId) {
     },
     "serverId": serverId,
     "players": {},
-    "nextPlayerId":0
+    "nextPlayerId":0,
+    "attacks":{
+      "placeholder":"placeholder"
+    },
 
   });
 
@@ -35,8 +38,6 @@ function setServer(serverId){
   //console.log(server, 'setServer() - 1')
 
   let serverRef = firebase.database().ref('servers/'+serverId);
-
-  //console.log(serverRef, 1)
 
   serverRef.once("value", function(snapshot){
 
@@ -60,9 +61,11 @@ function setServer(serverId){
 
     }*/
   });
-  var playerRef = firebase.database().ref('servers/' + serverId + "/players")
 
-  playerRef.on('child_changed', function(data) {
+
+  let playerRef = firebase.database().ref('servers/' + serverId + "/players")
+
+  playerRef.on('child_changed', function(data){
     //console.log("changed", data.val()["playerName"])
 
     //use forEach() for this! ---important---
@@ -74,7 +77,7 @@ function setServer(serverId){
     changedPlayer.frameX = newPlayer.frameX;
     changedPlayer.cooldownEffects = newPlayer.cooldownEffects;
     changedPlayer.health = newPlayer.health;
-    console.log('CHANGED')
+    //console.log('CHANGED')
   });
   playerRef.on('child_removed', function(data){
     console.log('player removed')
@@ -94,9 +97,20 @@ function setServer(serverId){
     firebase.database().ref('servers/'+server.serverId).update({
       nextPlayerId: server.players.length
     })
-  })
+  });
   console.log(server.players, 'setServer() - 2')
 
+
+
+  let attackRef = firebase.database().ref('servers/'+serverId+"/attacks")
+
+  attackRef.on('child_added', function(data){
+
+    if(data.val() !== "placeholder"){
+      d = data.val()["Attack"]
+      game.attacks.push(playerAttacks[d.num][d.type](d.x, d.y, d.rotation, d.player))
+    }
+  });
 }
 function updatePlayer(){
   firebase.database().ref('servers/'+server.serverId+'/players/'+server.playerKey+'/playerName').update({
@@ -134,4 +148,24 @@ console.log(tempPlayerID, server.playerId,'tempPlayer')
     id:server.playerId
   })
   game.switchState(4)
+}
+
+function sendAttack(player, type, rotation){
+    let key = firebase.database().ref('servers/'+server.serverId+'/attacks').push({
+      "Attack":{
+        num:player.num,
+        type:type,
+        x:player.x+player.width/2,
+        y:player.y+player.height/2,
+        rotation:rotation,
+        player:{
+          x:player.x,
+          y:player.y,
+          width:player.width,
+          height:player.height,
+
+        }
+      }
+    }).key;
+    return key;
 }
