@@ -93,12 +93,12 @@ function setServer(serverId){
     console.log('player added')
     let tempPlayer = new Player(1);
     server.players.push(tempPlayer)
-    console.log(server.players)
+
     firebase.database().ref('servers/'+server.serverId).update({
       nextPlayerId: server.players.length
     })
   });
-  console.log(server.players, 'setServer() - 2')
+
 
 
 
@@ -128,7 +128,7 @@ function updatePlayer(){
 function joinServer(serverId){
 
   setServer(serverId);
-  console.log(server.players, "post setServer()")
+
   mid.innerHTML = "connected to: " + serverId
   //console.log(server, 'joinServer()')
   //let defName = "p"+server.players.length.toString()
@@ -137,21 +137,22 @@ function joinServer(serverId){
     tempPlayerID = snapshot.val()["nextPlayerId"];
     server.playerId = tempPlayerID
   });
-console.log(tempPlayerID, server.playerId,'tempPlayer')
   server.playerKey = firebase.database().ref('servers/'+serverId+'/players').push({
       "playerName":new Player(1, server.players.length)
   }).key
-  console.log(server.players, 'final')
   server.playerId = server.players.length-1
-  console.log('playerId:', server.playerId)
   firebase.database().ref('servers/'+serverId+'/players/'+server.playerKey+'/playerName').update({
     id:server.playerId
   })
   game.switchState(4)
 }
+function removeAttack(key){
+  firebase.database().ref('servers/'+server.serverId+'/attacks/'+key).remove()
 
+}
 function sendAttack(player, type, rotation){
-    let key = firebase.database().ref('servers/'+server.serverId+'/attacks').push({
+
+    let key1 = firebase.database().ref('servers/'+server.serverId+'/attacks').push({
       "Attack":{
         num:player.num,
         type:type,
@@ -167,5 +168,6 @@ function sendAttack(player, type, rotation){
         }
       }
     }).key;
-    return key;
+
+    return key1;
 }

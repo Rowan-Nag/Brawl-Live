@@ -23,6 +23,7 @@ var keys = {down: 40,
     frameRate = 1/60,
     frameDelay = frameRate*1000,
     totalMenuButtons = 0,
+    hosting = false,
     boxes = false,
     ticks = 0,
     server = {playerId:0}
@@ -74,12 +75,12 @@ var requestInterval = function (fn, delay) {
 
 var mid = document.getElementById('middleP')
 
+/*
 var peer = new Peer;
-var peerId, mainConn, connections = [], hosting = false, connPosition = -2;
+var peerId, mainConn, connections = [], connPosition = -2;
 
 
 peer.on('open', function(id) {
-  console.log('My peer ID is: ' + id);
   peerId = id
 });
 
@@ -138,6 +139,18 @@ peer.on('connection', function(conn){
   })
 });
 
+function sendData(data, recievers){
+  for(let i = 0; i < recievers.length; i++){
+    recievers[i].send(data)
+
+  }
+}
+
+function connectToId(id){
+  let tempConn = peer.connect(id)
+  return tempConn
+}
+*/
 function startGame(){
 
   if(hosting){
@@ -151,17 +164,6 @@ function startGame(){
 
 }
 
-function sendData(data, recievers){
-  for(let i = 0; i < recievers.length; i++){
-    recievers[i].send(data)
-
-  }
-}
-
-function connectToId(id){
-  let tempConn = peer.connect(id)
-  return tempConn
-}
 
 function collision(a, b){
   return (a.x < b.x + b.width &&
@@ -394,7 +396,7 @@ class menuButton{
 }
 
 class Attack{
-  constructor(x, y, rotation, image, size, frames, type, player){
+  constructor(x, y, rotation, image, size, frames, type, player, fbKey){
     this.x = x;//X/Y starting pos
     this.y = y;
     this.size = size; //size scale
@@ -416,6 +418,8 @@ class Attack{
     this.currentFrame = 0; //current frame of animation
     this.image = image
     this.totalFrames = sprites[image].frames; //total frames of the animation
+
+    this.fbKey = fbKey; //key for FB database
 
     this.loop = false;//sprites[image].loop;
     this.ticksPerFrame = this.frames/this.totalFrames;
@@ -590,7 +594,7 @@ class Player{
     }
     ctx.drawImage(document.getElementById(this.image),32*this.frameX, 0, 32, 42, x, y, this.width, this.height);
     ctx.globalAlpha = 1
-    this.drawHealth(x, y-20)
+
     if(boxes){
       ctx.beginPath();
       ctx.strokeRect(this.x,this.y,this.width,this.height);
@@ -656,12 +660,14 @@ class Player{
       }
     }
   }
+
   mouseAngle(keyList){
 
 	 this.angle = Math.atan2(this.x+this.width/2 - mouseX, this.y+this.height/2 - mouseY)
    keyList["mouseAngle"] = this.angle
    return this.angle
   }
+
   moveX(x){
     let noCollision = true;
     for(let i = 0; i <game.mapCollision.length; i++){
@@ -682,6 +688,7 @@ class Player{
       this.x = (game.map.length-1)*game.tileSize
     }
   }
+
   moveY(y){
     let noCollision = true;
     for(let i = 0; i <game.mapCollision.length; i++){
@@ -722,17 +729,20 @@ class Player{
 
     if(keyList['mouseDown'] && this.cooldownEffects["autoCd"] < 0){
 
-      this.activeAttacks.push(playerAttacks[this.num].auto(this.x+this.width/2,this.y+this.height/2, -keyList["mouseAngle"], this))
+      let k = sendAttack(this, "auto", -keyList["mouseAngle"])
 
-      game.localAttacks.push(playerAttacks[this.num].auto(this.x+this.width/2,this.y+this.height/2, -keyList["mouseAngle"], this))
+      this.activeAttacks.push(playerAttacks[this.num].auto(this.x+this.width/2,this.y+this.height/2, -keyList["mouseAngle"], this, k))
+
+      game.localAttacks.push(playerAttacks[this.num].auto(this.x+this.width/2,this.y+this.height/2, -keyList["mouseAngle"], this, k))
 
       this.cooldownEffects["autoCd"] = this.activeAttacks[this.activeAttacks.length-1].cooldown;
 
       this.cooldownEffects["moveLock"] = this.activeAttacks[this.activeAttacks.length-1].moveLock;
 
+
       game.addAttack(this.activeAttacks[this.activeAttacks.length-1])
 
-      sendAttack(this, "auto", -keyList["mouseAngle"])
+
     }
 
     if(keys.shift in keyList){
@@ -913,13 +923,11 @@ class Game{
         if(OBBCollide(this.player2,this.attacks[i])){
           this.player2.cooldownEffects.invulnerability = 10
           this.player2.applyEffects(this.attacks[i].effects)
-          console.log("HIT")
         }
       }else if(this.attacks[i].player == this.player2 && this.player1.cooldownEffects.invulnerability < 0){
         if(OBBCollide(this.player1,this.attacks[i])){
           this.player1.cooldownEffects.invulnerability = 10
           this.player1.applyEffects(this.attacks[i].effects)
-          console.log("HIT")
         }
       }
     }
@@ -946,7 +954,7 @@ class Game{
   }
 
   listToMap(tiles){
-    console.log(tiles)
+
     let target = []
     for(let i = 0; i < tiles.length; i++){
 	    let b = [];
@@ -1040,19 +1048,26 @@ class Game{
   }
 
   drawSprites(){
+    for(let i = 0; i < this.players.length; i++){
+
+      this.players[i].draw(this.players[i].x-this.cameraX+WIDTH/2, this.players[i].y-this.cameraY+HEIGHT/2)
+    }
     for(let i = 0; i < this.attacks.length; i++){
       this.attacks[i].draw(this.attacks[i].x-this.cameraX+WIDTH/2,this.attacks[i].y-this.cameraY+HEIGHT/2);
       if(this.attacks[i].currentFrame==this.attacks[i].totalFrames){
         //if(hosting){
         //this.attacks[i].player.activeAttacks.splice(i,1);
         //}
+
         this.attacks.splice(i, 1);
         i -= 1
       }
     }
     for(let i = 0; i <this.localAttacks.length; i++){
-      
+
       if(this.localAttacks[i].currentFrame == this.localAttacks[i].totalFrames){
+
+        removeAttack(this.localAttacks[i].fbKey)
         this.localAttacks.splice(i,1);
         this.players[server.playerId].activeAttacks.splice(i,1)
         i -= 1
@@ -1061,10 +1076,7 @@ class Game{
     for(let i = 0; i < this.sprites.length; i++){
       this.sprites[i].draw();
     }
-    for(let i = 0; i < this.players.length; i++){
 
-      this.players[i].draw(this.players[i].x-this.cameraX+WIDTH/2, this.players[i].y-this.cameraY+HEIGHT/2)
-    }
   }
 
   switchMenu(target){
@@ -1182,6 +1194,9 @@ class Game{
         this.drawMap(this.map);
         this.drawMap(this.mapAdds);
         this.drawSprites();
+        for(let i = 0;i<this.players.length;i++){
+          this.players[i].drawHealth(this.players[i].x-this.cameraX+WIDTH/2, this.players[i].y-this.cameraY+HEIGHT/2-20)
+        }
     }
   }
 
@@ -1222,6 +1237,11 @@ function updateTicks(){
   for(let i = 0; i < game.attacks.length; i++){
     if(ticks%game.attacks[i].ticksPerFrame<1){
       game.attacks[i].incrementFrame()
+    }
+  }
+  for(let i = 0; i < game.localAttacks.length; i++){
+    if(ticks%game.localAttacks[i].ticksPerFrame<1){
+      game.localAttacks[i].incrementFrame()
     }
   }
 }
