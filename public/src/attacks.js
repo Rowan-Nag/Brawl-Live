@@ -1,12 +1,12 @@
 var playerAttacks = {
   //x, y, attackImg, size scale, frames (speed of attack), attack template
   1:{
-    auto:function(x, y, rotation, player, k){return new Attack(x, y,rotation, "playerOneBasicAttack", 1.3, 1, "melee1", player, k)},
+    auto:function(x, y, rotation, player, k, pKey){return new Attack(x, y,rotation, "playerOneBasicAttack", 1.3, 1, "melee1", player, k, pKey);console.log(pKey)},
     roll:function(player){return new Movement(2, 3, 14, 120, player)}
 
   },
   2:{
-    auto:function(x, y, rotation, player, k){return new Attack(x, y,rotation, "playerTwoBasicAttack", 1.3, 1, "melee1", player, k)},
+    auto:function(x, y, rotation, player, k, pKey){return new Attack(x, y,rotation, "playerTwoBasicAttack", 1.3, 1, "melee1", player, k, pKey)},
     roll:function(player){return new Movement(8, 6, 17, 100, player)}
 
   },
@@ -42,7 +42,7 @@ var attackData = {
 
 
 class Attack{
-  constructor(x, y, rotation, image, size, frames, type, player, fbKey){
+  constructor(x, y, rotation, image, size, frames, type, player, fbKey, pKey){
     this.x = x;//X/Y starting pos
     this.y = y;
     this.size = size; //size scale
@@ -64,7 +64,7 @@ class Attack{
     this.currentFrame = 0; //current frame of animation
     this.image = image
     this.totalFrames = sprites[image].frames; //total frames of the animation
-
+    this.pKey = pKey;
     this.fbKey = fbKey; //key for FB database
 
     this.loop = false;//sprites[image].loop;

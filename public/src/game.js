@@ -275,6 +275,7 @@ class Player{
     this.attackImg= playerData.images[num].attack
     this.rotation = 0
 
+
     //collision variables
     this.tr= {x:this.x+this.width,y:this.y}
     this.br= {x:this.x+this.width,y:this.y+this.height}
@@ -292,6 +293,13 @@ class Player{
     this.effects = {}
     this.cooldowns = ["moveLock", "autoCd", "rolling", "invulnerability"]
 
+  }
+
+  updateCorners(){
+    this.tr= {x:this.x+this.width,y:this.y}
+    this.br= {x:this.x+this.width,y:this.y+this.height}
+    this.tl= {x:this.x,y:this.y}
+    this.bl= {x:this.x,y:this.y+this.height}
   }
 
   draw(x, y){
@@ -386,7 +394,7 @@ class Player{
     }
     if(noCollision){
       this.x+=x
-      moveCorners(this.tr, this.br, this.tl, this.bl, x, 0)
+      //moveCorners(this.tr, this.br, this.tl, this.bl, x, 0)
     }
     if(this.x < 0){
       this.x = 0
@@ -407,7 +415,7 @@ class Player{
     }
     if(noCollision){
       this.y+=y
-      moveCorners(this.tr, this.br, this.tl, this.bl, 0, y)
+      //moveCorners(this.tr, this.br, this.tl, this.bl, 0, y)
     }
     if(this.y < 0){
       this.y = 0
@@ -439,9 +447,9 @@ class Player{
 
       let k = sendAttack(this, "auto", -keyList["mouseAngle"])
 
-      this.activeAttacks.push(playerAttacks[this.num].auto(this.x+this.width/2,this.y+this.height/2, -keyList["mouseAngle"], this, k))
+      this.activeAttacks.push(playerAttacks[this.num].auto(this.x+this.width/2,this.y+this.height/2, -keyList["mouseAngle"], this, k, server.playerKey))
 
-      game.localAttacks.push(playerAttacks[this.num].auto(this.x+this.width/2,this.y+this.height/2, -keyList["mouseAngle"], this, k))
+      game.localAttacks.push(playerAttacks[this.num].auto(this.x+this.width/2,this.y+this.height/2, -keyList["mouseAngle"], this, k, server.playerKey))
 
       this.cooldownEffects["autoCd"] = this.activeAttacks[this.activeAttacks.length-1].cooldown;
 
@@ -623,6 +631,8 @@ class Game{
   }
 
   attackCollision(){
+    this.player1.updateCorners();
+    this.player2.updateCorners();
 
     for(let i = 0; i < this.attacks.length; i++){
 
@@ -636,6 +646,21 @@ class Game{
         if(OBBCollide(this.player1,this.attacks[i])){
           this.player1.cooldownEffects.invulnerability = 10
           this.player1.applyEffects(this.attacks[i].effects)
+        }
+      }
+    }
+  }
+
+  fbAttackCollision(){
+    server.players[server.playerId].updateCorners();
+    console.log(this.attacks)
+    for(let i = 0; i < this.attacks.length; i++){
+      console.log(this.attacks[i].pKey, server.playerKey)
+      if(this.attacks[i].pKey != server.playerKey && server.players[server.playerId].cooldownEffects.invulnerability < 0){
+
+        if(OBBCollide(server.players[server.playerId],this.attacks[i])){
+          server.players[server.playerId].cooldownEffects.invulnerability = 10
+          server.players[server.playerId].applyEffects(this.attacks[i].effects)
         }
       }
     }
@@ -897,7 +922,7 @@ class Game{
         if(this.players[server.playerId].cooldownEffects.moveLock<=0){
           this.players[server.playerId].move(keysDown);
         }
-
+        this.fbAttackCollision()
         updatePlayer()
         this.drawMap(this.map);
         this.drawMap(this.mapAdds);

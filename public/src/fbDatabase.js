@@ -108,7 +108,8 @@ function setServer(serverId){
 
     if(data.val() !== "placeholder"){
       d = data.val()["Attack"]
-      game.attacks.push(playerAttacks[d.num][d.type](d.x, d.y, d.rotation, d.player))
+      game.attacks.push(playerAttacks[d.num][d.type](d.x, d.y, d.rotation, d.player,0, d.pKey))
+      console.log(d.pKey, game.attacks[game.attacks.length-1].pKey)
     }
   });
 }
@@ -165,7 +166,8 @@ function sendAttack(player, type, rotation){
           width:player.width,
           height:player.height,
 
-        }
+        },
+        pKey:server.playerKey
       }
     }).key;
 
