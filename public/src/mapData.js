@@ -73,6 +73,17 @@ var tileData = {
   },
 }
 
+class Tile{
+  constructor(x, y, width, height, type, collision){
+    this.x = x;
+    this.y = y;
+    this.width = width;
+    this.height = height;
+    this.image = document.getElementById(type);
+    this.collision = collision;
+  }
+}
+
 var playerData = {
    //just images for now
   images:{
