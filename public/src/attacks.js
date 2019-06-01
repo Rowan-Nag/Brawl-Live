@@ -136,7 +136,7 @@ class Attack{
 class Movement{
   constructor(startLag, endLag, frames, distance,  player){
     this.player = player;
-    console.log(player)
+
     this.startLag = startLag;
     this.endLag = endLag;
     this.frames = frames;
@@ -175,9 +175,9 @@ class Movement{
       this.player.cooldownEffects["invulnerability"] = this.moveFrames
     }
     if(this.frame > this.startLag && this.frame < this.frames-this.endLag){
-      console.log(this.player.x,this.player.y)
+
       this.player.moveX(Math.cos(this.angle)*this.distance/this.moveFrames)
-      console.log(Math.cos(this.angle), this.distance, this.moveFrames)
+
       this.player.moveY(Math.sin(this.angle)*this.distance/this.moveFrames)
     }
     else{
