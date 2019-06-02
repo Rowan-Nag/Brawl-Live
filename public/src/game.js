@@ -757,6 +757,10 @@ class Game{
 			  	break;
 
 			  case 15:
+				  b.push(new Tile(j*this.tileSize, i*this.tileSize, this.tileSize, this.tileSize, 'middleGrass', 0))
+			  	break;
+				  
+			  case 16:
 				  b.push(new Tile(j*this.tileSize, i*this.tileSize, this.tileSize, this.tileSize, 'grass', 0))
 			  	break;
 
