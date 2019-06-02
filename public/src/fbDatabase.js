@@ -90,6 +90,7 @@ function setServer(serverId){
     })
   });
   playerRef.on('child_added', function(data){
+    console.log(data.val()["playerName"]["num"])
     console.log('player added')
     let tempPlayer = new Player(1);
     server.players.push(tempPlayer)
