@@ -58,18 +58,20 @@ function hostButton(){
 
 function createServerButton(){ ////////////////////////////////////////////////////////////////////////////////////////////
   sID = document.getElementById('peerId').value;
-  if(sID.length > 3){
+  if(sID.length > 2){
     createServer(sID, 1)
     game.switchState(4)
+  }else{
+    mid.innerHTML="Enter a name of at <u>LEAST</u> 3 characters."
   }
 }
 
 function joinServerButton(){
   sID = document.getElementById('peerId').value;
-  console.log('joining server ', sID)
-  if(sID.length > 3){
-    joinServer(sID)
 
+  if(sID.length > 2){
+    joinServer(sID)
+  console.log('joining server ', sID)
   }
 }
 

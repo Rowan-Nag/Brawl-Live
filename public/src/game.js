@@ -75,82 +75,6 @@ var requestInterval = function (fn, delay) {
 
 var mid = document.getElementById('middleP')
 
-/*
-var peer = new Peer;
-var peerId, mainConn, connections = [], connPosition = -2;
-
-
-peer.on('open', function(id) {
-  peerId = id
-});
-
-
-peer.on('connection', function(conn){
-  console.log('connected to ', conn.id)
-  if(hosting){
-    console.log('hosting ', conn.id)
-  }
-  else if(!hosting){
-    console.log('hosted by ', conn.id)
-
-    }
-  conn.on('data', function(data){
-    //console.log('recieved ', data, ' from ', conn.id)
-    switch(data[0]){
-    case 0:
-
-		mid.innerHTML=data[1].toString();
-
-		break;
-
-    case 1:
-      mainConn=connectToId(data[1])
-      mid.innerHTML = "Both Players Have Been Connected!"
-      break;
-
-    case 2:
-      mainConn.send([4, game.player1.num])
-      startGame()
-      break;
-
-    case 3:
-      game.p2Keys = data[1]
-      break;
-    case 4:
-      this.player2 = new Player(data[1],0)
-      break;
-    case 5:
-      game.player2.x = data[1][0];
-      game.player2.y = data[1][1];
-      game.player2.image = data[1][2];
-      game.player2.health = data[1][5];
-      game.player2.cooldownEffects = data[1][4];
-
-      game.player1.x = data[2][0];
-      game.player1.y = data[2][1];
-      game.player1.image = data[2][2];
-      game.player1.health = data[2][5]
-      game.player1.cooldownEffects = data[2][4];
-      break;
-    case 6:
-      game.attacks.push(new Attack(data[1],data[2],data[3],data[4],data[5],data[6],data[7],game.player1))
-      console.log(game.attacks[0])
-  }
-  })
-});
-
-function sendData(data, recievers){
-  for(let i = 0; i < recievers.length; i++){
-    recievers[i].send(data)
-
-  }
-}
-
-function connectToId(id){
-  let tempConn = peer.connect(id)
-  return tempConn
-}
-*/
 function startGame(){
 
   if(hosting){
@@ -388,7 +312,7 @@ class Player{
     let noCollision = true;
     for(let i = 0; i <game.mapCollision.length; i++){
       if(collision({x:this.x+x,y:this.y,width:this.width,height:this.height}, game.mapCollision[i])){
-        console.log("collide")
+        //console.log("collide")
         noCollision = false
       }
     }
@@ -398,7 +322,7 @@ class Player{
     }
     if(this.x < 0){
       this.x = 0
-      console.log("resetX")
+      //console.log("resetX")
     }
     if(this.x > (game.map.length-1)*game.tileSize){
       this.x = (game.map.length-1)*game.tileSize
@@ -409,7 +333,7 @@ class Player{
     let noCollision = true;
     for(let i = 0; i <game.mapCollision.length; i++){
       if(collision({x:this.x,y:this.y+y,width:this.width,height:this.height}, game.mapCollision[i])){
-        console.log("collide")
+        //console.log("collide")
         noCollision = false
       }
     }
@@ -419,7 +343,7 @@ class Player{
     }
     if(this.y < 0){
       this.y = 0
-      console.log("resetY")
+      //console.log("resetY")
     }
 
     if(this.y > (game.map[0].length-1)*game.tileSize){
@@ -653,9 +577,9 @@ class Game{
 
   fbAttackCollision(){
     server.players[server.playerId].updateCorners();
-    console.log(this.attacks)
+    //console.log(this.attacks)
     for(let i = 0; i < this.attacks.length; i++){
-      console.log(this.attacks[i].pKey, server.playerKey)
+      //console.log(this.attacks[i].pKey, server.playerKey)
       if(this.attacks[i].pKey != server.playerKey && server.players[server.playerId].cooldownEffects.invulnerability < 0){
 
         if(OBBCollide(server.players[server.playerId],this.attacks[i])){
@@ -759,7 +683,7 @@ class Game{
 			  case 15:
 				  b.push(new Tile(j*this.tileSize, i*this.tileSize, this.tileSize, this.tileSize, 'middleGrass', 0))
 			  	break;
-				  
+
 			  case 16:
 				  b.push(new Tile(j*this.tileSize, i*this.tileSize, this.tileSize, this.tileSize, 'grass', 0))
 			  	break;
